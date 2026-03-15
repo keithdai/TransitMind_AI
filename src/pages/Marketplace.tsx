@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Search, 
@@ -273,8 +273,15 @@ export default function Marketplace() {
     tags: '',
     features: ''
   })
-  const [customAgents, setCustomAgents] = useState<Agent[]>([])
+  const [customAgents, setCustomAgents] = useState<Agent[]>(() => {
+    const saved = localStorage.getItem('customAgents')
+    return saved ? JSON.parse(saved) : []
+  })
   const { addFavorite, removeFavorite, isFavorite } = useFavorites()
+
+  useEffect(() => {
+    localStorage.setItem('customAgents', JSON.stringify(customAgents))
+  }, [customAgents])
 
   const allAgents = [...agents, ...customAgents]
 
