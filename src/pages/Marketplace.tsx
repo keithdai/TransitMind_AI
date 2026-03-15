@@ -19,9 +19,7 @@ import {
   PlayCircle,
   BookOpen,
   ExternalLink,
-  Link2,
-  Settings,
-  Upload
+  Link2
 } from 'lucide-react'
 import { useFavorites } from '../contexts/FavoritesContext'
 
@@ -276,7 +274,7 @@ export default function Marketplace() {
     features: ''
   })
   const [customAgents, setCustomAgents] = useState<Agent[]>([])
-  const { favorites, addFavorite, removeFavorite, isFavorite } = useFavorites()
+  const { addFavorite, removeFavorite, isFavorite } = useFavorites()
 
   const allAgents = [...agents, ...customAgents]
 
@@ -414,7 +412,7 @@ export default function Marketplace() {
                     color: activeFilter === filter.id ? 'var(--accent-primary)' : 'var(--text-secondary)'
                   }}
                 >
-                  {'icon' in filter && <filter.icon className="w-4 h-4" />}
+                  {'icon' in filter && filter.icon && <filter.icon className="w-4 h-4" />}
                   <span>{filter.label}</span>
                 </motion.button>
               ))}

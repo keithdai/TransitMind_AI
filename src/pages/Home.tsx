@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Send, 
@@ -19,7 +19,6 @@ import {
   MessageCircle,
   HelpCircle,
   Plus,
-  Star,
   Coins
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'

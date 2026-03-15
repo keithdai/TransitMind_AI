@@ -15,16 +15,13 @@ import {
   Settings,
   X,
   File,
-  FileImage,
   FileSpreadsheet,
   Loader2,
   Eye,
   Play,
   History,
   RotateCcw,
-  Download,
-  ChevronDown,
-  ChevronUp
+  Download
 } from 'lucide-react'
 
 interface KnowledgeBaseItem {

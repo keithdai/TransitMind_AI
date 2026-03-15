@@ -6,22 +6,18 @@ import {
   Download,
   FileText,
   BarChart3,
-  Clock,
   CheckCircle2,
   Loader2,
   Database,
   Wrench,
   Link2,
   Pause,
-  Play,
   RotateCcw,
   Layout,
   Map,
   LineChart,
   PieChart,
   FileSpreadsheet,
-  X,
-  ChevronDown,
   ArrowLeft,
   Home
 } from 'lucide-react'
@@ -126,7 +122,7 @@ const outputs = [
 ]
 
 export default function Workspace() {
-  const { agentId } = useParams()
+  const { agentId: _agentId } = useParams() // agentId 用于后续扩展
   const navigate = useNavigate()
   const [messages, setMessages] = useState<Message[]>(mockMessages)
   const [input, setInput] = useState('')
@@ -189,7 +185,7 @@ export default function Workspace() {
     setShowTemplates(false)
   }
 
-  const renderChart = (data: typeof chartData) => {
+  const renderChart = (data: typeof chartData): JSX.Element => {
     const maxValue = Math.max(...data.map(d => d.value))
     
     return (
@@ -491,7 +487,7 @@ export default function Workspace() {
                         </div>
                       )}
 
-                      {message.outputType === 'chart' && message.outputData && renderChart(message.outputData as typeof chartData)}
+                      {message.outputType === 'chart' && message.outputData ? renderChart(message.outputData as typeof chartData) : null}
                       {message.outputType === 'map' && renderMap()}
 
                       {message.attachments && (

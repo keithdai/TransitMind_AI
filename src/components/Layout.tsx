@@ -108,7 +108,7 @@ export default function Layout() {
                 >
                   <NavLink
                     to={item.path}
-                    className={({ isActive }) =>
+                    className={() =>
                       `group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300`
                     }
                     style={({ isActive }) => ({
@@ -117,10 +117,10 @@ export default function Layout() {
                       color: isActive ? 'var(--accent-primary)' : 'var(--text-secondary)'
                     })}
                   >
-                    {({ isActive }) => (
+                    {() => (
                       <>
                         <item.icon className="w-4 h-4" />
-                        <span className="text-sm font-medium" style={{ color: isActive ? 'var(--accent-primary)' : 'var(--text-primary)' }}>{item.label}</span>
+                        <span className="text-sm font-medium">{item.label}</span>
                       </>
                     )}
                   </NavLink>
