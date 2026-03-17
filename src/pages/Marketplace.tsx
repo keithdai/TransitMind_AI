@@ -19,17 +19,21 @@ import {
   PlayCircle,
   BookOpen,
   ExternalLink,
-  Link2
+  Link2,
+  FileText
 } from 'lucide-react'
 import { useFavorites } from '../contexts/FavoritesContext'
 
 const categories = [
   { id: 'all', label: '全部', icon: Layers },
+  { id: 'material', label: '材料生产', icon: FileText },
+  { id: 'knowledge', label: '知识检索', icon: Search },
+  { id: 'business', label: '业务协同', icon: Users },
+  { id: 'data', label: '数据分析', icon: BarChart3 },
   { id: 'planning', label: '规划类', icon: Layers },
   { id: 'compliance', label: '合规类', icon: Shield },
   { id: 'project', label: '项目类', icon: FolderKanban },
   { id: 'emergency', label: '应急类', icon: AlertTriangle },
-  { id: 'data', label: '数据类', icon: BarChart3 },
 ]
 
 interface UseCase {
@@ -236,6 +240,638 @@ const agents: Agent[] = [
         title: '通用问答',
         description: '回答各类通用问题',
         result: '提供准确的答案和相关建议'
+      }
+    ]
+  },
+  {
+    id: 'material_1',
+    name: '会议纪要生成',
+    description: '对办公会、专题会、协调会等录音或转写内容自动生成纪要，提炼议定事项、责任科室、完成时限',
+    category: 'material',
+    icon: '📝',
+    color: 'from-blue-500 to-cyan-500',
+    rating: 4.9,
+    users: 328,
+    tags: ['材料生产', '会议纪要', '公文处理'],
+    subscribed: false,
+    features: ['录音转写', '要点提炼', '责任分配', '多格式输出'],
+    knowledgeBases: ['局内纪要模板', '历史纪要', '科室职责清单'],
+    recommended: true,
+    useCases: [
+      {
+        title: '办公会纪要生成',
+        description: '自动生成局办公会会议纪要',
+        result: '输出正式版和简版纪要，包含议定事项和责任分工'
+      },
+      {
+        title: '专题会纪要',
+        description: '生成专题会议纪要',
+        result: '输出结构化纪要，包含议题、讨论内容和决议'
+      }
+    ]
+  },
+  {
+    id: 'material_2',
+    name: '请示文与公文起草',
+    description: '根据事项背景、问题、拟请示内容自动生成请示、报告、函、情况说明等公文初稿',
+    category: 'material',
+    icon: '📄',
+    color: 'from-purple-500 to-pink-500',
+    rating: 4.8,
+    users: 256,
+    tags: ['材料生产', '公文起草', '格式规范'],
+    subscribed: false,
+    features: ['公文模板', '格式规范', '审核要点提示'],
+    knowledgeBases: ['公文模板', '历史优秀文稿', '常用口径库'],
+    recommended: true,
+    useCases: [
+      {
+        title: '请示起草',
+        description: '生成请示公文初稿',
+        result: '输出符合公文格式的请示文本'
+      },
+      {
+        title: '报告起草',
+        description: '生成情况报告初稿',
+        result: '输出规范的情况报告文本'
+      }
+    ]
+  },
+  {
+    id: 'material_3',
+    name: '招标采购需求文件与合同编写',
+    description: '根据采购事项、项目需求和历史范本，辅助编写需求文件、采购文件、合同文本',
+    category: 'material',
+    icon: '📋',
+    color: 'from-green-500 to-emerald-500',
+    rating: 4.7,
+    users: 189,
+    tags: ['材料生产', '采购管理', '合同编写'],
+    subscribed: false,
+    features: ['需求说明书', '招标文件', '合同文本', '合规审查'],
+    knowledgeBases: ['采购模板', '合同范本', '历史采购项目材料'],
+    useCases: [
+      {
+        title: '采购需求文件',
+        description: '生成采购需求说明书',
+        result: '输出完整的技术需求和规格说明'
+      },
+      {
+        title: '合同文本编写',
+        description: '生成合同初稿',
+        result: '输出符合规范的合同文本'
+      }
+    ]
+  },
+  {
+    id: 'material_4',
+    name: '周报月报收口',
+    description: '汇总各科室报送内容，自动去重、归类、统一格式，形成局级周报、月报',
+    category: 'material',
+    icon: '📊',
+    color: 'from-orange-500 to-red-500',
+    rating: 4.6,
+    users: 312,
+    tags: ['材料生产', '周报月报', '汇总统计'],
+    subscribed: false,
+    features: ['自动去重', '智能归类', '格式统一', '统计报表'],
+    knowledgeBases: ['周报月报模板', '历史报送材料', '分类规则'],
+    useCases: [
+      {
+        title: '周报汇总',
+        description: '汇总各科室周报',
+        result: '生成局级周报和重点事项清单'
+      },
+      {
+        title: '月报收口',
+        description: '汇总各科室月报',
+        result: '生成局级月报和数据分析'
+      }
+    ]
+  },
+  {
+    id: 'material_5',
+    name: '公文审核校对',
+    description: '对已形成公文进行错别字、格式、逻辑、政策依据、表述风险检查',
+    category: 'material',
+    icon: '✅',
+    color: 'from-teal-500 to-cyan-500',
+    rating: 4.8,
+    users: 421,
+    tags: ['材料生产', '公文审核', '质量检查'],
+    subscribed: false,
+    features: ['错别字检查', '格式规范', '逻辑审核', '风险预警'],
+    knowledgeBases: ['公文规范', '局内行文要求', '政策文件库'],
+    recommended: true,
+    useCases: [
+      {
+        title: '公文审核',
+        description: '全面审核公文内容',
+        result: '输出审核报告和修改建议'
+      }
+    ]
+  },
+  {
+    id: 'material_6',
+    name: '会议材料提纲自动生成',
+    description: '根据会议主题、现有材料及历史模板，快速生成会议材料提纲和汇报框架',
+    category: 'material',
+    icon: '📑',
+    color: 'from-indigo-500 to-purple-500',
+    rating: 4.5,
+    users: 178,
+    tags: ['材料生产', '提纲生成', '汇报材料'],
+    subscribed: false,
+    features: ['提纲生成', '框架设计', '要点提取', '时长建议'],
+    knowledgeBases: ['会议通知', '历史会议材料', '汇报模板'],
+    useCases: [
+      {
+        title: '汇报提纲生成',
+        description: '生成领导汇报材料提纲',
+        result: '输出完整的汇报框架和要点目录'
+      }
+    ]
+  },
+  {
+    id: 'material_7',
+    name: '领导汇报PPT编制',
+    description: '根据会议主题、已有文稿自动生成PPT目录、页标题、核心观点和正文要点',
+    category: 'material',
+    icon: '📈',
+    color: 'from-cyan-500 to-blue-500',
+    rating: 4.7,
+    users: 234,
+    tags: ['材料生产', 'PPT制作', '汇报演示'],
+    subscribed: false,
+    features: ['目录结构', '页标题设计', '图表建议', '演讲要点'],
+    knowledgeBases: ['历史汇报PPT', '重点项目资料', '年度重点工作清单'],
+    useCases: [
+      {
+        title: 'PPT大纲生成',
+        description: '生成汇报PPT大纲',
+        result: '输出PPT结构和每页核心内容'
+      }
+    ]
+  },
+  {
+    id: 'material_8',
+    name: '年度总结与述职材料编制',
+    description: '基于全年周报、纪要、台账自动形成年度总结、述职材料、亮点成效',
+    category: 'material',
+    icon: '📋',
+    color: 'from-yellow-500 to-orange-500',
+    rating: 4.6,
+    users: 156,
+    tags: ['材料生产', '年度总结', '述职报告'],
+    subscribed: false,
+    features: ['亮点提炼', '问题分析', '计划制定'],
+    knowledgeBases: ['年度任务清单', '周月报', '历史总结范文'],
+    useCases: [
+      {
+        title: '年度总结',
+        description: '生成年度工作总结',
+        result: '输出包含亮点和问题的总结报告'
+      },
+      {
+        title: '述职报告',
+        description: '生成述职报告',
+        result: '输出结构化述职材料'
+      }
+    ]
+  },
+  {
+    id: 'material_9',
+    name: 'OA通讯稿自动生成',
+    description: '针对会议、调研、学习等活动，自动生成OA通讯稿或信息稿',
+    category: 'material',
+    icon: '📰',
+    color: 'from-pink-500 to-rose-500',
+    rating: 4.4,
+    users: 198,
+    tags: ['材料生产', '通讯稿', '宣传文案'],
+    subscribed: false,
+    features: ['多风格支持', '自动排版', '模板匹配'],
+    knowledgeBases: ['历史OA通讯稿', '宣传信息稿', '典型活动材料'],
+    useCases: [
+      {
+        title: '会议通讯稿',
+        description: '生成会议通讯稿',
+        result: '输出规范的OA通讯稿'
+      }
+    ]
+  },
+  {
+    id: 'material_10',
+    name: '年报/简报编制',
+    description: '面向年度工作报告、阶段性专报、专项简报等，自动汇总各类材料',
+    category: 'material',
+    icon: '📚',
+    color: 'from-violet-500 to-purple-500',
+    rating: 4.5,
+    users: 167,
+    tags: ['材料生产', '年报编制', '简报生成'],
+    subscribed: false,
+    features: ['多类型支持', '数据统计', '格式规范'],
+    knowledgeBases: ['历史年报', '简报模板', '任务台账'],
+    useCases: [
+      {
+        title: '年度报告',
+        description: '生成年度工作报告',
+        result: '输出完整的年度工作报告'
+      },
+      {
+        title: '专报生成',
+        description: '生成专项简报',
+        result: '输出专项工作简报'
+      }
+    ]
+  },
+  {
+    id: 'material_11',
+    name: '领导讲话稿与发言提纲',
+    description: '根据会议主题和近期工作自动生成讲话稿、发言提纲、对上汇报口径',
+    category: 'material',
+    icon: '🎤',
+    color: 'from-red-500 to-pink-500',
+    rating: 4.7,
+    users: 145,
+    tags: ['材料生产', '讲话稿', '发言提纲'],
+    subscribed: false,
+    features: ['讲话稿生成', '要点提炼', '口语化表达'],
+    knowledgeBases: ['历史讲话稿', '专题汇报材料', '近期重点工作信息'],
+    useCases: [
+      {
+        title: '讲话稿生成',
+        description: '生成领导讲话稿',
+        result: '输出完整的讲话稿文本'
+      }
+    ]
+  },
+  {
+    id: 'material_12',
+    name: '报会办会材料生成与通知辅助',
+    description: '定期收集议题，结合会议流程、函件和以往模板，自动生成报会材料、会议通知',
+    category: 'material',
+    icon: '🏢',
+    color: 'from-slate-500 to-gray-500',
+    rating: 4.3,
+    users: 123,
+    tags: ['材料生产', '会议材料', '通知生成'],
+    subscribed: false,
+    features: ['材料生成', '通知编写', '议程安排'],
+    knowledgeBases: ['会议流程', '会务模板', '历史报会材料'],
+    useCases: [
+      {
+        title: '报会材料生成',
+        description: '生成报会材料',
+        result: '输出完整的报会材料'
+      },
+      {
+        title: '会议通知',
+        description: '生成会议通知',
+        result: '输出规范的通知文本'
+      }
+    ]
+  },
+  {
+    id: 'knowledge_1',
+    name: '历史会议纪要检索',
+    description: '按项目名、事项名、道路名、企业名、时间等检索历史纪要，快速回答以前怎么定的',
+    category: 'knowledge',
+    icon: '🔍',
+    color: 'from-blue-600 to-indigo-600',
+    rating: 4.9,
+    users: 567,
+    tags: ['知识检索', '历史查询', '纪要检索'],
+    subscribed: false,
+    features: ['关键词检索', '高级筛选', '自然语言查询', '原文引用'],
+    knowledgeBases: ['历史会议纪要', '会议通知', '督办单'],
+    recommended: true,
+    useCases: [
+      {
+        title: '历史纪要查询',
+        description: '检索历史会议纪要',
+        result: '返回相关纪要列表和原文引用'
+      }
+    ]
+  },
+  {
+    id: 'knowledge_2',
+    name: '政策法规问答',
+    description: '围绕交通及相关领域法规、规范性文件、上级政策开展问答，输出依据条文和出处',
+    category: 'knowledge',
+    icon: '⚖️',
+    color: 'from-amber-500 to-yellow-500',
+    rating: 4.8,
+    users: 432,
+    tags: ['知识检索', '政策法规', '问答系统'],
+    subscribed: false,
+    features: ['智能问答', '条文引用', '政策解读', '相关推荐'],
+    knowledgeBases: ['法律法规', '规范性文件', '上级政策文件'],
+    recommended: true,
+    useCases: [
+      {
+        title: '政策咨询',
+        description: '咨询相关政策法规',
+        result: '返回答案和相关条文依据'
+      }
+    ]
+  },
+  {
+    id: 'knowledge_3',
+    name: '局内制度流程问答',
+    description: '对发文、请示、采购、合同等内部流程开展问答式导航',
+    category: 'knowledge',
+    icon: '📋',
+    color: 'from-emerald-500 to-teal-500',
+    rating: 4.7,
+    users: 389,
+    tags: ['知识检索', '流程问答', '制度查询'],
+    subscribed: false,
+    features: ['流程导航', '材料清单', '时限提醒', '模板推荐'],
+    knowledgeBases: ['局内制度文件', '流程文件', '表单模板'],
+    useCases: [
+      {
+        title: '流程咨询',
+        description: '咨询业务流程',
+        result: '返回流程步骤和所需材料'
+      }
+    ]
+  },
+  {
+    id: 'knowledge_4',
+    name: '历史材料复用',
+    description: '检索历史请示、报告、讲话稿等，提取可复用结构、段落和规范表达',
+    category: 'knowledge',
+    icon: '📂',
+    color: 'from-orange-500 to-amber-500',
+    rating: 4.6,
+    users: 234,
+    tags: ['知识检索', '材料复用', '历史参考'],
+    subscribed: false,
+    features: ['结构提取', '段落推荐', '规范表达', '写作建议'],
+    knowledgeBases: ['历史文稿库', '材料模板库'],
+    useCases: [
+      {
+        title: '材料参考',
+        description: '查找可复用的历史材料',
+        result: '返回可复用的结构和段落'
+      }
+    ]
+  },
+  {
+    id: 'knowledge_5',
+    name: '单项目资料问答',
+    description: '围绕某一重点项目建立专属知识库，查询项目背景、历次协调意见、时间线',
+    category: 'knowledge',
+    icon: '🗂️',
+    color: 'from-cyan-500 to-sky-500',
+    rating: 4.5,
+    users: 178,
+    tags: ['知识检索', '项目查询', '资料管理'],
+    subscribed: false,
+    features: ['项目背景', '协调意见', '时间线', '问题清单'],
+    knowledgeBases: ['项目全周期资料'],
+    useCases: [
+      {
+        title: '项目查询',
+        description: '查询项目相关资料',
+        result: '返回项目背景和历史资料'
+      }
+    ]
+  },
+  {
+    id: 'business_1',
+    name: '信访舆情自动筛选分发与答复辅助',
+    description: '对信访舆情事项进行自动筛选、分类分发、转办，生成答复初稿',
+    category: 'business',
+    icon: '📨',
+    color: 'from-red-500 to-rose-500',
+    rating: 4.8,
+    users: 156,
+    tags: ['业务协同', '信访处理', '舆情管理'],
+    subscribed: false,
+    features: ['自动筛选', '分类分发', '答复生成', '风险提示'],
+    knowledgeBases: ['历史信访件', '舆情案例', '答复口径'],
+    recommended: true,
+    useCases: [
+      {
+        title: '信访件处理',
+        description: '处理信访件并生成答复',
+        result: '输出分类结果和答复初稿'
+      }
+    ]
+  },
+  {
+    id: 'business_2',
+    name: '人大建议和政协提案处置辅助',
+    description: '对人大建议、政协提案进行自动筛选分发、转办，生成答复初稿',
+    category: 'business',
+    icon: '🏛️',
+    color: 'from-purple-500 to-violet-500',
+    rating: 4.7,
+    users: 134,
+    tags: ['业务协同', '建议提案', '办理辅助'],
+    subscribed: false,
+    features: ['筛选分发', '要点提取', '答复生成', '质量评估'],
+    knowledgeBases: ['历史建议提案', '历年答复材料', '办理规范'],
+    useCases: [
+      {
+        title: '提案办理',
+        description: '辅助办理人大建议政协提案',
+        result: '输出办理建议和答复初稿'
+      }
+    ]
+  },
+  {
+    id: 'business_3',
+    name: '督办事项分解与跟踪',
+    description: '从纪要、公文、批示件中抽取待办事项，自动生成责任台账和时间节点',
+    category: 'business',
+    icon: '🎯',
+    color: 'from-yellow-500 to-orange-500',
+    rating: 4.9,
+    users: 289,
+    tags: ['业务协同', '督办管理', '任务跟踪'],
+    subscribed: false,
+    features: ['事项抽取', '责任分配', '时间节点', '进展汇总'],
+    knowledgeBases: ['纪要', '公文', '批示件', '督办台账'],
+    recommended: true,
+    useCases: [
+      {
+        title: '督办分解',
+        description: '分解督办事项',
+        result: '输出待办清单和责任分工'
+      }
+    ]
+  },
+  {
+    id: 'business_4',
+    name: '外业踏勘前内业支撑',
+    description: '针对道路、停车、设施等外业任务，自动汇总项目背景、历史问题、踏勘重点',
+    category: 'business',
+    icon: '🛣️',
+    color: 'from-green-500 to-emerald-500',
+    rating: 4.6,
+    users: 178,
+    tags: ['业务协同', '外业支撑', '踏勘辅助'],
+    subscribed: false,
+    features: ['背景汇总', '问题清单', '重点提取', '检查表'],
+    knowledgeBases: ['历史项目资料', '投诉工单', '设施基础资料'],
+    useCases: [
+      {
+        title: '踏勘准备',
+        description: '生成踏勘准备资料',
+        result: '输出项目背景和检查清单'
+      }
+    ]
+  },
+  {
+    id: 'business_5',
+    name: '建设项目台账管理与进展报告',
+    description: '对建设项目进展情况进行动态跟踪，自动汇总形成阶段性进展报告',
+    category: 'business',
+    icon: '🏗️',
+    color: 'from-blue-500 to-indigo-500',
+    rating: 4.5,
+    users: 234,
+    tags: ['业务协同', '项目管理', '进度跟踪'],
+    subscribed: false,
+    features: ['台账管理', '进展汇总', '问题清单', '预警提醒'],
+    knowledgeBases: ['建设项目台账', '进度报送材料', '会议纪要'],
+    useCases: [
+      {
+        title: '项目进展报告',
+        description: '生成项目进展报告',
+        result: '输出进展报告和问题清单'
+      }
+    ]
+  },
+  {
+    id: 'business_6',
+    name: '领导批示件办理辅助',
+    description: '对领导批示内容进行解析，生成办理建议、背景材料、回复口径',
+    category: 'business',
+    icon: '📌',
+    color: 'from-pink-500 to-rose-500',
+    rating: 4.4,
+    users: 145,
+    tags: ['业务协同', '批示办理', '跟踪反馈'],
+    subscribed: false,
+    features: ['批示解析', '办理建议', '背景材料', '回复口径'],
+    knowledgeBases: ['批示件', '项目背景材料', '历史办理稿'],
+    useCases: [
+      {
+        title: '批示办理',
+        description: '辅助办理领导批示',
+        result: '输出办理建议和回复口径'
+      }
+    ]
+  },
+  {
+    id: 'business_7',
+    name: '专项工作专班协同',
+    description: '围绕专项任务汇总材料，形成专报、问题清单和阶段性进展',
+    category: 'business',
+    icon: '👥',
+    color: 'from-indigo-500 to-blue-500',
+    rating: 4.3,
+    users: 123,
+    tags: ['业务协同', '专项工作', '专班协同'],
+    subscribed: false,
+    features: ['材料汇总', '专报生成', '问题清单', '任务分工'],
+    knowledgeBases: ['专班材料', '阶段台账', '会议纪要'],
+    useCases: [
+      {
+        title: '专班工作汇总',
+        description: '汇总专班工作材料',
+        result: '输出专报和问题清单'
+      }
+    ]
+  },
+  {
+    id: 'business_8',
+    name: '新人入职与岗位辅导',
+    description: '回答岗位职责、常见工作、流程要求、模板使用和注意事项',
+    category: 'business',
+    icon: '👋',
+    color: 'from-teal-500 to-cyan-500',
+    rating: 4.8,
+    users: 456,
+    tags: ['业务协同', '新人辅导', '岗位培训'],
+    subscribed: false,
+    features: ['岗位说明', '工作指南', '流程图解', '常见问题'],
+    knowledgeBases: ['岗位手册', '制度流程', '模板和案例'],
+    recommended: true,
+    useCases: [
+      {
+        title: '入职辅导',
+        description: '回答新人入职问题',
+        result: '返回岗位说明和工作指南'
+      }
+    ]
+  },
+  {
+    id: 'data_1',
+    name: '固投台账报表自动生成',
+    description: '结合固投任务目标及项目投资计划，自动生成固投进展报告',
+    category: 'data',
+    icon: '📈',
+    color: 'from-green-600 to-emerald-600',
+    rating: 4.7,
+    users: 189,
+    tags: ['数据分析', '固投管理', '报表生成'],
+    subscribed: false,
+    features: ['进展报告', '进度对比', '异常提醒', '图表展示'],
+    knowledgeBases: ['固投任务目标', '投资计划', '历史报表'],
+    useCases: [
+      {
+        title: '固投报表',
+        description: '生成固投进展报表',
+        result: '输出包含图表的进展报告'
+      }
+    ]
+  },
+  {
+    id: 'data_2',
+    name: '研究项目台账报表与节点提醒',
+    description: '围绕研究项目进度计划、支付情况，自动生成项目台账报表并开展节点提醒',
+    category: 'data',
+    icon: '🔬',
+    color: 'from-purple-500 to-violet-500',
+    rating: 4.6,
+    users: 145,
+    tags: ['数据分析', '项目管理', '节点提醒'],
+    subscribed: false,
+    features: ['台账报表', '节点提醒', '支付计划', '查重参考'],
+    knowledgeBases: ['研究项目台账', '合同信息', '支付计划'],
+    useCases: [
+      {
+        title: '项目台账',
+        description: '生成研究项目台账',
+        result: '输出项目台账和提醒'
+      }
+    ]
+  },
+  {
+    id: 'data_3',
+    name: '数据分析与图表说明',
+    description: '根据Excel表、统计报表自动生成同比环比分析、图表说明和结论摘要',
+    category: 'data',
+    icon: '📊',
+    color: 'from-cyan-500 to-blue-500',
+    rating: 4.8,
+    users: 367,
+    tags: ['数据分析', '图表生成', '统计分析'],
+    subscribed: false,
+    features: ['数据分析', '图表生成', '同比环比', '结论摘要'],
+    knowledgeBases: ['指标说明', '历史报表'],
+    recommended: true,
+    useCases: [
+      {
+        title: '数据分析',
+        description: '分析上传的数据',
+        result: '输出分析报告和图表'
       }
     ]
   },
