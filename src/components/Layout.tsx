@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useLocation } from 'react-router-dom'
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Home, 
@@ -12,21 +12,28 @@ import {
   Sun,
   Eye,
   Zap,
-  Landmark
+  Landmark,
+  Code2,
+  LogOut
 } from 'lucide-react'
 import { useState } from 'react'
 import { useTheme } from '../contexts/ThemeContext'
+import { useAuth } from '../contexts/AuthContext'
 
 const navItems = [
   { path: '/', icon: Home, label: '智能体工作台' },
-  { path: '/marketplace', icon: Store, label: '智能体超市' },
+  { path: '/marketplace', icon: Store, label: '智能体市场' },
   { path: '/knowledge-base', icon: Database, label: '知识库' },
+  { path: '/developer', icon: Code2, label: '智能体自定义' },
 ]
 
 export default function Layout() {
   const location = useLocation()
+  const navigate = useNavigate()
   const { theme, setTheme } = useTheme()
+  const { logout } = useAuth()
   const [showThemeMenu, setShowThemeMenu] = useState(false)
+  const [showUserMenu, setShowUserMenu] = useState(false)
 
   const themeOptions = [
     { id: 'dark', label: '深色模式', icon: Moon },
@@ -191,18 +198,47 @@ export default function Layout() {
               </span>
             </motion.button>
             
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border"
-              style={{ background: 'linear-gradient(to right, rgba(0, 229, 255, 0.2), rgba(123, 97, 255, 0.2))', borderColor: 'var(--border-hover)' }}
-            >
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[var(--accent-secondary)] to-[var(--accent-primary)] flex items-center justify-center">
-                <User className="w-3 h-3 text-white" />
-              </div>
-              <span className="text-sm" style={{ color: 'var(--text-primary)' }}>张明</span>
-              <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.1)', color: 'var(--text-muted)' }}>交通规划部</span>
-            </motion.button>
+            <div className="relative">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border"
+                style={{ background: 'linear-gradient(to right, rgba(0, 229, 255, 0.2), rgba(123, 97, 255, 0.2))', borderColor: 'var(--border-hover)' }}
+              >
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[var(--accent-secondary)] to-[var(--accent-primary)] flex items-center justify-center">
+                  <User className="w-3 h-3 text-white" />
+                </div>
+                <span className="text-sm" style={{ color: 'var(--text-primary)' }}>张明</span>
+                <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.1)', color: 'var(--text-muted)' }}>交通规划部</span>
+              </motion.button>
+              
+              <AnimatePresence>
+                {showUserMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute right-0 top-14 glass-panel p-2 min-w-[140px] z-50"
+                  >
+                    <button
+                      onClick={() => { 
+                        logout()
+                        navigate('/login')
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
+                      style={{ 
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        color: '#ef4444'
+                      }}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>退出登录</span>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             <NavLink to="/settings">
               <motion.button
@@ -249,6 +285,8 @@ export default function Layout() {
             <span>交通智能化管理平台</span>
           </div>
           <div className="flex items-center gap-4">
+            <span>深城交研究院研发</span>
+            <span>|</span>
             <span className="font-mono">Build: 2024.01.15</span>
             <span>|</span>
             <span>内网部署</span>

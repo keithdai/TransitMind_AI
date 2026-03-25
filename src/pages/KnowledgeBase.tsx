@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Plus, 
@@ -21,7 +21,10 @@ import {
   Play,
   History,
   RotateCcw,
-  Download
+  Download,
+  ExternalLink,
+  Globe,
+  Save
 } from 'lucide-react'
 
 interface KnowledgeBaseItem {
@@ -51,6 +54,34 @@ interface SearchResult {
   snippet: string
   relevance: number
 }
+
+interface ExternalKnowledgeBase {
+  id: string
+  name: string
+  icon: string
+  url: string
+  description: string
+  color: string
+}
+
+const defaultExternalKBs: ExternalKnowledgeBase[] = [
+  {
+    id: 'ragflow',
+    name: 'RAGFlow',
+    icon: '🔗',
+    url: '',
+    description: '企业级RAG知识库平台，支持文档解析与智能检索',
+    color: 'from-blue-500 to-cyan-500'
+  },
+  {
+    id: 'dify',
+    name: 'Dify',
+    icon: '🤖',
+    url: '',
+    description: 'LLM应用开发平台，可视化构建AI应用',
+    color: 'from-purple-500 to-pink-500'
+  }
+]
 
 const knowledgeBases: KnowledgeBaseItem[] = [
   {
@@ -184,6 +215,25 @@ export default function KnowledgeBase() {
   const [testSearchQuery, setTestSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [showVersions, setShowVersions] = useState<string | null>(null)
+  
+  const [externalKBs, setExternalKBs] = useState<ExternalKnowledgeBase[]>(() => {
+    const saved = localStorage.getItem('externalKnowledgeBases')
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      return defaultExternalKBs.map(defaultKB => {
+        const savedKB = parsed.find((kb: ExternalKnowledgeBase) => kb.id === defaultKB.id)
+        return savedKB ? { ...defaultKB, url: savedKB.url } : defaultKB
+      })
+    }
+    return defaultExternalKBs
+  })
+  const [showConfigModal, setShowConfigModal] = useState(false)
+  const [configuringKB, setConfiguringKB] = useState<ExternalKnowledgeBase | null>(null)
+  const [configUrl, setConfigUrl] = useState('')
+
+  useEffect(() => {
+    localStorage.setItem('externalKnowledgeBases', JSON.stringify(externalKBs))
+  }, [externalKBs])
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -227,6 +277,31 @@ export default function KnowledgeBase() {
     setShowVersions(null)
   }
 
+  const handleOpenConfig = (kb: ExternalKnowledgeBase) => {
+    setConfiguringKB(kb)
+    setConfigUrl(kb.url)
+    setShowConfigModal(true)
+  }
+
+  const handleSaveConfig = () => {
+    if (configuringKB) {
+      setExternalKBs(prev => prev.map(kb => 
+        kb.id === configuringKB.id ? { ...kb, url: configUrl } : kb
+      ))
+    }
+    setShowConfigModal(false)
+    setConfiguringKB(null)
+    setConfigUrl('')
+  }
+
+  const handleVisitExternal = (kb: ExternalKnowledgeBase) => {
+    if (!kb.url) {
+      alert(`请先配置 ${kb.name} 的链接地址`)
+      return
+    }
+    window.open(kb.url, '_blank')
+  }
+
   return (
     <div className="h-full p-6 overflow-auto">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -250,51 +325,135 @@ export default function KnowledgeBase() {
           </motion.button>
         </motion.div>
 
-        <div className="grid grid-cols-3 gap-4">
-          {knowledgeBases.map((kb, index) => (
-            <motion.div
-              key={kb.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.02, y: -5 }}
-              onClick={() => setSelectedKB(kb)}
-              className="glass-card p-5 cursor-pointer group"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="p-3 rounded-xl" style={{ background: 'linear-gradient(135deg, rgba(0, 229, 255, 0.2), rgba(123, 97, 255, 0.2))' }}>
-                  <Layers className="w-6 h-6" style={{ color: 'var(--accent-primary)' }} />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="glass-panel p-6"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Globe className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} />
+            <h2 className="font-display text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>外部知识库</h2>
+            <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(0, 229, 255, 0.1)', color: 'var(--accent-primary)' }}>
+              可配置
+            </span>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            {externalKBs.map((kb, index) => (
+              <motion.div
+                key={kb.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="rounded-xl border p-4 transition-all hover:border-opacity-50"
+                style={{ 
+                  background: 'rgba(255,255,255,0.03)', 
+                  borderColor: 'var(--border-color)'
+                }}
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${kb.color} flex items-center justify-center text-2xl`}>
+                      {kb.icon}
+                    </div>
+                    <div>
+                      <h3 className="font-medium" style={{ color: 'var(--text-primary)' }}>{kb.name}</h3>
+                      <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{kb.description}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  {kb.status === 'ready' ? (
-                    <CheckCircle2 className="w-4 h-4 text-green-400" />
-                  ) : kb.status === 'processing' ? (
-                    <Loader2 className="w-4 h-4 animate-spin" style={{ color: 'var(--accent-primary)' }} />
-                  ) : (
-                    <AlertCircle className="w-4 h-4 text-red-400" />
-                  )}
+                
+                {kb.url && (
+                  <div className="mb-3 p-2 rounded-lg flex items-center gap-2" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                    <Link2 className="w-3 h-3" style={{ color: 'var(--accent-primary)' }} />
+                    <span className="text-xs truncate flex-1" style={{ color: 'var(--text-secondary)' }}>{kb.url}</span>
+                  </div>
+                )}
+                
+                <div className="flex items-center gap-2">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleOpenConfig(kb)}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
+                    style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)' }}
+                  >
+                    <Settings className="w-4 h-4" />
+                    <span>配置链接</span>
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleVisitExternal(kb)}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
+                    style={{ 
+                      background: kb.url ? 'rgba(0, 229, 255, 0.1)' : 'rgba(255,255,255,0.05)', 
+                      color: kb.url ? 'var(--accent-primary)' : 'var(--text-muted)',
+                      border: kb.url ? '1px solid var(--border-hover)' : '1px solid transparent'
+                    }}
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    <span>访问</span>
+                  </motion.button>
                 </div>
-              </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
 
-              <h3 className="font-display font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>{kb.name}</h3>
-              <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>{kb.description}</p>
-
-              <div className="flex items-center justify-between text-sm" style={{ color: 'var(--text-muted)' }}>
-                <div className="flex items-center gap-1">
-                  <FileText className="w-4 h-4" />
-                  <span>{kb.documentCount} 个文档</span>
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <Layers className="w-5 h-5" style={{ color: 'var(--accent-secondary)' }} />
+            <h2 className="font-display text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>内部知识库</h2>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-4">
+            {knowledgeBases.map((kb, index) => (
+              <motion.div
+                key={kb.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ scale: 1.02, y: -5 }}
+                onClick={() => setSelectedKB(kb)}
+                className="glass-card p-5 cursor-pointer group"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 rounded-xl" style={{ background: 'linear-gradient(135deg, rgba(0, 229, 255, 0.2), rgba(123, 97, 255, 0.2))' }}>
+                    <Layers className="w-6 h-6" style={{ color: 'var(--accent-primary)' }} />
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {kb.status === 'ready' ? (
+                      <CheckCircle2 className="w-4 h-4 text-green-400" />
+                    ) : kb.status === 'processing' ? (
+                      <Loader2 className="w-4 h-4 animate-spin" style={{ color: 'var(--accent-primary)' }} />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-red-400" />
+                    )}
+                  </div>
                 </div>
-                <span>{kb.lastUpdated}</span>
-              </div>
 
-              <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--border-color)' }}>
-                <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-muted)' }}>
-                  <Link2 className="w-3 h-3" />
-                  <span>关联 {kb.linkedAgents.length} 个智能体</span>
+                <h3 className="font-display font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>{kb.name}</h3>
+                <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>{kb.description}</p>
+
+                <div className="flex items-center justify-between text-sm" style={{ color: 'var(--text-muted)' }}>
+                  <div className="flex items-center gap-1">
+                    <FileText className="w-4 h-4" />
+                    <span>{kb.documentCount} 个文档</span>
+                  </div>
+                  <span>{kb.lastUpdated}</span>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+
+                <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--border-color)' }}>
+                  <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-muted)' }}>
+                    <Link2 className="w-3 h-3" />
+                    <span>关联 {kb.linkedAgents.length} 个智能体</span>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
         <AnimatePresence>
@@ -508,6 +667,86 @@ export default function KnowledgeBase() {
           )}
         </AnimatePresence>
       </div>
+
+      <AnimatePresence>
+        {showConfigModal && configuringKB && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-8"
+            onClick={() => setShowConfigModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="glass-panel p-8 max-w-lg w-full"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${configuringKB.color} flex items-center justify-center text-xl`}>
+                    {configuringKB.icon}
+                  </div>
+                  <div>
+                    <h2 className="font-display text-xl font-bold" style={{ color: 'var(--text-primary)' }}>配置 {configuringKB.name}</h2>
+                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{configuringKB.description}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowConfigModal(false)}
+                  className="p-2 rounded-lg transition-colors"
+                  style={{ background: 'rgba(255,255,255,0.05)' }}
+                >
+                  <X className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                    链接地址
+                  </label>
+                  <div className="relative">
+                    <Link2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+                    <input
+                      type="url"
+                      value={configUrl}
+                      onChange={(e) => setConfigUrl(e.target.value)}
+                      placeholder="https://example.com"
+                      className="input-cyber pl-12"
+                    />
+                  </div>
+                  <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
+                    请输入 {configuringKB.name} 的访问地址，点击访问时将在新窗口打开
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowConfigModal(false)}
+                  className="cyber-button"
+                >
+                  取消
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleSaveConfig}
+                  className="cyber-button-primary flex items-center gap-2"
+                >
+                  <Save className="w-4 h-4" />
+                  保存配置
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {showSearchTest && (

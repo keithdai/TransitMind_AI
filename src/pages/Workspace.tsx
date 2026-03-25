@@ -22,6 +22,7 @@ import {
   Home
 } from 'lucide-react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { getAgentById, Agent } from '../data/agents'
 
 interface Message {
   id: string
@@ -43,20 +44,22 @@ interface Template {
 }
 
 const templates: Template[] = [
-  { id: '1', name: '交通流量分析', description: '分析路段流量数据', category: 'analysis', icon: '🚦' },
-  { id: '2', name: '合规检查报告', description: '生成合规审查报告', category: 'report', icon: '📋' },
-  { id: '3', name: '应急响应方案', description: '生成应急处置方案', category: 'emergency', icon: '🚨' },
-  { id: '4', name: '项目进度报告', description: '生成项目进度报告', category: 'report', icon: '📊' },
-  { id: '5', name: '线路优化建议', description: '分析线路优化方案', category: 'analysis', icon: '🗺️' },
-  { id: '6', name: '数据统计报告', description: '生成数据统计报告', category: 'report', icon: '📈' },
+  { id: '1', name: '会议纪要生成', description: '根据会议内容生成纪要', category: 'document', icon: '📝' },
+  { id: '2', name: '公文起草', description: '起草各类政务公文', category: 'document', icon: '📄' },
+  { id: '3', name: '政策解读', description: '解读政策法规要点', category: 'analysis', icon: '📋' },
+  { id: '4', name: '工作汇报', description: '生成工作汇报材料', category: 'report', icon: '📊' },
+  { id: '5', name: '请示批复', description: '起草请示及批复文件', category: 'document', icon: '✉️' },
+  { id: '6', name: '督查督办', description: '生成督查督办报告', category: 'report', icon: '🔍' },
 ]
 
-const agentInfo = {
-  id: '1',
-  name: '交通分析智能体',
-  icon: '🚦',
-  color: 'from-cyan-500 to-blue-500',
-  description: '分析交通流量数据，识别拥堵热点，提供优化建议',
+const defaultAgentInfo = {
+  id: 'default',
+  name: '政务办公助手',
+  icon: '🏛️',
+  color: 'from-blue-500 to-indigo-500',
+  description: '智能处理公文写作、会议纪要、政策解读等政务办公任务',
+  knowledgeBases: ['政策法规知识库', '公文模板知识库'],
+  demoScenarios: []
 }
 
 const chartData = [
@@ -69,51 +72,9 @@ const chartData = [
   { name: '周日', value: 38 },
 ]
 
-const mockMessages: Message[] = [
-  {
-    id: '1',
-    role: 'user',
-    content: '帮我分析XX路段的交通流量数据',
-    timestamp: new Date(Date.now() - 1000 * 60 * 5),
-  },
-  {
-    id: '2',
-    role: 'assistant',
-    content: '好的，我来分析XX路段的交通流量数据。正在检索相关数据...',
-    timestamp: new Date(Date.now() - 1000 * 60 * 4),
-    status: 'done',
-  },
-  {
-    id: '3',
-    role: 'assistant',
-    content: `分析完成！以下是XX路段交通流量的主要发现：
-
-**1. 高峰时段拥堵指数**
-早高峰（7:00-9:00）拥堵指数达到 8.2，晚高峰（17:00-19:00）拥堵指数为 7.8。
-
-**2. 主要拥堵点**
-- XX路与YY路交叉口：平均等待时间 180 秒
-- XX路段中段：车速降至 15km/h
-- 公交站点附近：频繁停车导致拥堵
-
-**3. 优化建议**
-- 调整信号灯配时，优化交叉口通行效率
-- 增设左转专用车道
-- 优化公交站点位置，减少对主路影响`,
-    timestamp: new Date(Date.now() - 1000 * 60 * 2),
-    status: 'done',
-    outputType: 'chart',
-    outputData: chartData,
-    attachments: [
-      { name: '交通流量分析报告.pdf', type: 'pdf' },
-      { name: '拥堵热点分布图.png', type: 'image' },
-    ],
-  },
-]
-
 const tasks = [
-  { id: '1', name: 'XX路段流量分析', status: 'active', progress: 75 },
-  { id: '2', name: '上周报告生成', status: 'done', progress: 100 },
+  { id: '1', name: '会议纪要生成', status: 'active', progress: 75 },
+  { id: '2', name: '工作汇报撰写', status: 'done', progress: 100 },
 ]
 
 const outputs = [
@@ -122,14 +83,42 @@ const outputs = [
 ]
 
 export default function Workspace() {
-  const { agentId: _agentId } = useParams() // agentId 用于后续扩展
+  const { agentId } = useParams()
   const navigate = useNavigate()
-  const [messages, setMessages] = useState<Message[]>(mockMessages)
+  const [agentInfo, setAgentInfo] = useState<Agent | typeof defaultAgentInfo>(defaultAgentInfo)
+  const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
   const [selectedOutputType, setSelectedOutputType] = useState<'chart' | 'map' | 'table' | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (agentId) {
+      const agent = getAgentById(agentId)
+      if (agent) {
+        setAgentInfo(agent)
+        if (agent.demoScenarios.length > 0) {
+          const firstScenario = agent.demoScenarios[0]
+          setMessages([
+            {
+              id: '1',
+              role: 'user',
+              content: firstScenario.userInput,
+              timestamp: new Date(Date.now() - 1000 * 60 * 5),
+            },
+            {
+              id: '2',
+              role: 'assistant',
+              content: firstScenario.agentResponse,
+              timestamp: new Date(Date.now() - 1000 * 60 * 4),
+              status: 'done',
+            }
+          ])
+        }
+      }
+    }
+  }, [agentId])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -157,7 +146,7 @@ export default function Workspace() {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: '好的，我来为您生成一份详细的报告。请稍候...',
+        content: '好的，我来为您处理。请稍候...',
         timestamp: new Date(),
         status: 'thinking',
       }
@@ -169,7 +158,7 @@ export default function Workspace() {
             ? { 
                 ...m, 
                 status: 'done', 
-                content: '报告已生成完成！您可以在右侧输出面板查看和下载。',
+                content: '处理完成！您可以在右侧输出面板查看和下载结果。',
                 outputType: 'chart',
                 outputData: chartData
               }
@@ -282,10 +271,12 @@ export default function Workspace() {
       
       <div className="absolute bottom-2 left-2 flex items-center gap-2 px-2 py-1 rounded text-xs" style={{ background: 'var(--bg-card)' }}>
         <Map className="w-3 h-3" style={{ color: 'var(--accent-primary)' }} />
-        <span style={{ color: 'var(--text-secondary)' }}>XX路段拥堵分布</span>
+        <span style={{ color: 'var(--text-secondary)' }}>项目分布图</span>
       </div>
     </div>
   )
+
+  const knowledgeBases = agentInfo.knowledgeBases || ['政策法规知识库', '公文模板知识库']
 
   return (
     <div className="h-screen flex flex-col" style={{ background: 'var(--bg-primary)' }}>
@@ -321,7 +312,7 @@ export default function Workspace() {
             style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)' }}
           >
             <Home className="w-4 h-4" />
-            <span className="text-sm">智能体超市</span>
+            <span className="text-sm">智能体市场</span>
           </motion.button>
         </div>
       </header>
@@ -596,7 +587,7 @@ export default function Workspace() {
               知识库
             </h4>
             <div className="space-y-2">
-              {['交通法规知识库', '历史数据知识库'].map((kb) => (
+              {knowledgeBases.map((kb) => (
                 <div key={kb} className="flex items-center gap-2 p-2 rounded-lg transition-colors cursor-pointer" style={{ background: 'rgba(255,255,255,0.05)' }}>
                   <div className="w-2 h-2 rounded-full" style={{ background: 'var(--accent-primary)' }} />
                   <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{kb}</span>
@@ -636,7 +627,7 @@ export default function Workspace() {
               相关资源
             </h4>
             <div className="space-y-2">
-              {['XX路段数据', '历史对比', '相关法规'].map((res) => (
+              {['历史会议纪要', '公文范文库', '政策文件'].map((res) => (
                 <div key={res} className="flex items-center gap-2 p-2 rounded-lg transition-colors cursor-pointer" style={{ background: 'rgba(255,255,255,0.05)' }}>
                   <div className="w-2 h-2 rounded-full" style={{ background: 'var(--accent-secondary)' }} />
                   <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{res}</span>

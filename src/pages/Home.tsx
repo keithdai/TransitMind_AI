@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Send, 
@@ -23,36 +23,18 @@ import {
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useHistory } from '../contexts/HistoryContext'
+import { agents, getMvpAgents } from '../data/agents'
 
 const suggestions = [
-  { text: '帮我分析XX路段的交通流量数据', icon: Target },
-  { text: '生成一份交通规划报告', icon: Lightbulb },
-  { text: '检查这个项目的合规性', icon: CheckCircle2 },
-  { text: '查询上个月的应急事件统计', icon: Zap },
-]
-
-const defaultAgents = [
-  { id: '1', name: '交通分析', icon: '🚦', color: 'from-cyan-500 to-blue-500' },
-  { id: '2', name: '合规检查', icon: '📋', color: 'from-purple-500 to-pink-500' },
-  { id: '3', name: '报告生成', icon: '📊', color: 'from-green-500 to-emerald-500' },
-  { id: '4', name: '应急响应', icon: '🚨', color: 'from-orange-500 to-red-500' },
-  { id: '5', name: '线路优化', icon: '🗺️', color: 'from-teal-500 to-cyan-500' },
-  { id: '6', name: '项目跟踪', icon: '📅', color: 'from-blue-500 to-indigo-500' },
-]
-
-const availableAgents = [
-  { id: '1', name: '交通分析', icon: '🚦', color: 'from-cyan-500 to-blue-500' },
-  { id: '2', name: '合规检查', icon: '📋', color: 'from-purple-500 to-pink-500' },
-  { id: '3', name: '报告生成', icon: '📊', color: 'from-green-500 to-emerald-500' },
-  { id: '4', name: '应急响应', icon: '🚨', color: 'from-orange-500 to-red-500' },
-  { id: '5', name: '线路优化', icon: '🗺️', color: 'from-teal-500 to-cyan-500' },
-  { id: '6', name: '项目跟踪', icon: '📅', color: 'from-blue-500 to-indigo-500' },
-  { id: '7', name: '外部AI助手', icon: '🤖', color: 'from-indigo-500 to-purple-500' },
+  { text: '帮我查一下差旅费报销标准', icon: Target },
+  { text: '起草一份办公设备采购请示', icon: Lightbulb },
+  { text: '解读政府采购公开招标门槛', icon: CheckCircle2 },
+  { text: '生成项目进度风险报告', icon: Zap },
 ]
 
 const thinkingSteps = [
-  { label: '理解意图', status: 'done', detail: '识别为数据分析任务' },
-  { label: '提取实体', status: 'done', detail: 'XX路段、交通流量' },
+  { label: '理解意图', status: 'done', detail: '识别为知识检索任务' },
+  { label: '提取要素', status: 'done', detail: '差旅费、报销标准' },
   { label: '匹配智能体', status: 'active', detail: '正在匹配最佳智能体...' },
   { label: '准备执行', status: 'pending', detail: '等待中' },
 ]
@@ -76,8 +58,50 @@ export default function Home() {
   const navigate = useNavigate()
   const { history, addToHistory, removeFromHistory, clearHistory } = useHistory()
   
-  const [myAgents, setMyAgents] = useState(defaultAgents)
+  const mvpAgents = getMvpAgents()
+  
+  const defaultAgents = mvpAgents.slice(0, 6).map(agent => ({
+    id: agent.id,
+    name: agent.name,
+    icon: agent.icon,
+    color: agent.color
+  }))
+  
+  const customAgents = (() => {
+    const saved = localStorage.getItem('customAgents')
+    return saved ? JSON.parse(saved) : []
+  })()
+  
+  const availableAgents = [...agents, ...customAgents].map(agent => ({
+    id: agent.id,
+    name: agent.name,
+    icon: agent.icon,
+    color: agent.color
+  }))
+  
+  const [myAgents, setMyAgents] = useState(() => {
+    const saved = localStorage.getItem('myFavoriteAgents')
+    if (saved) {
+      try {
+        const savedIds = JSON.parse(saved) as string[]
+        const savedAgents = savedIds
+          .map(id => availableAgents.find(a => a.id === id))
+          .filter(Boolean) as typeof defaultAgents
+        if (savedAgents.length > 0) {
+          return savedAgents
+        }
+      } catch {
+        // ignore parse errors
+      }
+    }
+    return defaultAgents
+  })
   const [showAddAgent, setShowAddAgent] = useState(false)
+
+  useEffect(() => {
+    const agentIds = myAgents.map(a => a.id)
+    localStorage.setItem('myFavoriteAgents', JSON.stringify(agentIds))
+  }, [myAgents])
 
   const handleRemoveAgent = (agentId: string) => {
     setMyAgents(prev => prev.filter(a => a.id !== agentId))
@@ -98,14 +122,14 @@ export default function Home() {
     if (input.includes('处理') || input.includes('帮我') && !input.includes('分析') && !input.includes('检查') && !input.includes('生成')) {
       setShowClarification(true)
       setClarificationOptions([
-        { id: '1', text: '分析交通流量数据', agentId: '1', agentName: '交通分析智能体' },
-        { id: '2', text: '检查项目合规性', agentId: '2', agentName: '合规检查智能体' },
-        { id: '3', text: '生成项目报告', agentId: '3', agentName: '报告生成智能体' },
+        { id: '1', text: '查询差旅费报销标准', agentId: 'mvp_1', agentName: '知识库检索智能体' },
+        { id: '2', text: '起草办公设备采购请示', agentId: 'mvp_3', agentName: '智能公文助手' },
+        { id: '3', text: '解读政府采购政策', agentId: 'mvp_2', agentName: '知识库问答智能体' },
       ])
       return
     }
     
-    addToHistory(input, '1', '交通分析智能体')
+    addToHistory(input, 'mvp_1', '知识库检索智能体')
     setIsThinking(true)
     setShowThinking(true)
     setTimeout(() => {
@@ -175,14 +199,14 @@ export default function Home() {
             style={{ background: 'rgba(0, 229, 255, 0.1)', borderColor: 'var(--border-hover)' }}
           >
             <Sparkles className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
-            <span className="text-sm font-medium" style={{ color: 'var(--accent-primary)' }}>智能体已就绪</span>
+            <span className="text-sm font-medium" style={{ color: 'var(--accent-primary)' }}>政务智能体已就绪</span>
           </motion.div>
           
           <h1 className="font-display text-4xl font-bold" style={{ color: 'var(--text-primary)' }}>
             有什么可以帮您的？
           </h1>
           <p className="max-w-xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
-            用自然语言描述您的需求，智能体工作台将理解您的意图并推荐最合适的智能体
+            用自然语言描述您的政务办公需求，智能体工作台将理解您的意图并推荐最合适的智能体
           </p>
         </motion.div>
 
@@ -205,7 +229,7 @@ export default function Home() {
                         handleSubmit()
                       }
                     }}
-                    placeholder="描述您的需求，例如：帮我分析XX路段的交通流量..."
+                    placeholder="描述您的需求，例如：帮我查一下差旅费报销标准..."
                     className="input-cyber text-lg py-4 pr-24 resize-none"
                     rows={3}
                     style={{ minHeight: '80px' }}
@@ -483,18 +507,18 @@ export default function Home() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-xl">
-                        🚦
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-xl">
+                        🔍
                       </div>
                       <div>
-                        <div className="font-medium" style={{ color: 'var(--text-primary)' }}>交通分析智能体</div>
+                        <div className="font-medium" style={{ color: 'var(--text-primary)' }}>知识库检索智能体</div>
                         <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>最适合您的需求</div>
                       </div>
                     </div>
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => navigate('/workspace/1')}
+                      onClick={() => navigate('/workspace/mvp_1')}
                       className="cyber-button-primary flex items-center gap-2"
                     >
                       <span>开始执行</span>
@@ -589,7 +613,7 @@ export default function Home() {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="glass-panel p-6 max-w-md w-full"
+                className="glass-panel p-6 max-w-md w-full max-h-[80vh] overflow-auto"
               >
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-display text-lg font-bold" style={{ color: 'var(--text-primary)' }}>添加常用智能体</h3>
@@ -619,7 +643,7 @@ export default function Home() {
                         <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${agent.color} flex items-center justify-center text-xl mb-2`}>
                           {agent.icon}
                         </div>
-                        <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{agent.name}</span>
+                        <span className="text-sm truncate w-full" style={{ color: 'var(--text-primary)' }}>{agent.name}</span>
                       </motion.button>
                     ))}
                   </div>
