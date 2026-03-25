@@ -138,7 +138,15 @@ export default function Home() {
   }
 
   const handleAgentClick = (agentId: string) => {
-    navigate(`/workspace/${agentId}`)
+    const customAgentsData = JSON.parse(localStorage.getItem('customAgents') || '[]')
+    const allAgentsData = [...agents, ...customAgentsData]
+    const agent = allAgentsData.find((a: { id: string; externalUrl?: string }) => a.id === agentId)
+    
+    if (agent?.externalUrl) {
+      window.open(agent.externalUrl, '_blank')
+    } else {
+      navigate(`/workspace/${agentId}`)
+    }
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
