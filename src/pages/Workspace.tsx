@@ -94,6 +94,8 @@ export default function Workspace() {
   const [isTyping, setIsTyping] = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
   const [selectedOutputType, setSelectedOutputType] = useState<'chart' | 'map' | 'table' | null>(null)
+  const [attachments, setAttachments] = useState<{ name: string; type: string; preview?: string }[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -132,44 +134,189 @@ export default function Workspace() {
   }, [messages])
 
   const handleSend = () => {
-    if (!input.trim()) return
+    if (!input.trim() && attachments.length === 0) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: input,
+      content: input || '[上传文件]',
       timestamp: new Date(),
+      attachments: attachments.length > 0 ? [...attachments] : undefined,
     }
 
     setMessages(prev => [...prev, userMessage])
     setInput('')
     setIsTyping(true)
 
+    const hasAttachments = attachments.length > 0
+    setAttachments([])
+
     setTimeout(() => {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: '好的，我来为您处理。请稍候...',
+        content: hasAttachments ? '收到您的文件和问题，正在分析...' : '好的，我来为您处理。请稍候...',
         timestamp: new Date(),
         status: 'thinking',
       }
       setMessages(prev => [...prev, assistantMessage])
       
+      const processingTime = hasAttachments ? 3000 : 2000
+      
       setTimeout(() => {
+        let responseContent = '处理完成！您可以在右侧输出面板查看和下载结果。'
+        let outputType: 'text' | 'chart' | 'map' | 'table' = 'chart'
+        let outputData: unknown = chartData
+        
+        if (hasAttachments) {
+          const fileNames = userMessage.attachments?.map(a => a.name).join('、') || ''
+          const agentName = (agentInfo as Agent).name || '政务助手'
+          
+          if (agentName.includes('知识库检索')) {
+            responseContent = `📄 **文件分析完成**
+
+**已识别文件**：${fileNames}
+
+**内容摘要**：
+- 文件类型：PDF文档
+- 识别的关键信息已提取
+
+**🔍 正在为您检索相关知识...**
+
+根据您上传的文件内容，我为您找到以下相关知识：
+
+📌 **相关政策**：《XX管理办法》
+📌 **关联文档**：《操作规程》
+📌 **历史案例**：2024年第XX号文件
+
+是否需要我详细解读某个文档内容？`
+            outputType = 'text'
+            outputData = undefined
+          } else if (agentName.includes('公文') || agentName.includes('审查')) {
+            responseContent = `📄 **文档分析完成**
+
+**已识别文件**：${fileNames}
+
+**初步审查结果**：
+
+| 检查项 | 结果 |
+|--------|------|
+| 格式规范 | ✅ 通过 |
+| 错别字 | ✅ 未发现 |
+| 逻辑结构 | ⚠️ 建议优化 |
+
+**💡 优化建议**：
+1. 建议补充具体数据支撑
+2. 第三段表述可更精炼
+
+是否需要我生成修改后的版本？`
+            outputType = 'text'
+            outputData = undefined
+          } else if (agentName.includes('会议')) {
+            responseContent = `🎙️ **会议录音分析完成**
+
+**已识别文件**：${fileNames}
+**音频时长**：约45分钟
+
+**识别结果**：
+- 会议主题：项目推进会议
+- 参会人员：5人
+- 关键决策：3项
+- 议定事项：4项
+
+**📋 会议纪要草稿**：
+
+**一、会议概况**
+时间、地点、参会人员...
+
+**二、核心议题**
+项目进度滞后问题
+
+**三、关键决策**
+1. 征地拆迁工作4月15日前完成
+2. 技术方案优化后报审
+
+**四、议定事项**
+| 事项 | 责任部门 | 时限 |
+|------|----------|------|
+| 征地拆迁协议 | 综合科 | 4月15日 |
+| 技术方案优化 | 技术科 | 4月10日 |
+
+是否需要我生成正式的会议纪要格式？`
+            outputType = 'text'
+            outputData = undefined
+          } else {
+            responseContent = `📄 **文件处理完成**
+
+**已识别文件**：${fileNames}
+
+**处理结果**：
+- ✅ 文件格式识别成功
+- ✅ 关键信息提取完成
+- ✅ 内容结构分析完成
+
+**💡 建议操作**：
+- 根据文件内容生成报告
+- 提取关键数据制作图表
+- 归档至知识库
+
+请告诉我您想如何进一步处理这些文件？`
+            outputType = 'text'
+            outputData = undefined
+          }
+        }
+        
         setMessages(prev => prev.map(m => 
           m.id === assistantMessage.id 
             ? { 
                 ...m, 
                 status: 'done', 
-                content: '处理完成！您可以在右侧输出面板查看和下载结果。',
-                outputType: 'chart',
-                outputData: chartData
+                content: responseContent,
+                outputType,
+                outputData
               }
             : m
         ))
         setIsTyping(false)
-      }, 2000)
+      }, processingTime)
     }, 1000)
+  }
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+
+    const newAttachments: { name: string; type: string; preview?: string }[] = []
+    
+    Array.from(files).forEach(file => {
+      const isImage = file.type.startsWith('image/')
+      newAttachments.push({
+        name: file.name,
+        type: file.type,
+        preview: isImage ? URL.createObjectURL(file) : undefined,
+      })
+    })
+
+    setAttachments(prev => [...prev, ...newAttachments])
+    
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
+  const removeAttachment = (index: number) => {
+    setAttachments(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const getFileIcon = (type: string) => {
+    if (type.startsWith('image/')) return '🖼️'
+    if (type.includes('pdf')) return '📕'
+    if (type.includes('word') || type.includes('document')) return '📄'
+    if (type.includes('sheet') || type.includes('excel')) return '📊'
+    if (type.includes('ppt') || type.includes('presentation')) return '📊'
+    if (type.includes('audio')) return '🎙️'
+    if (type.includes('video')) return '🎬'
+    return '📎'
   }
 
   const handleTemplateSelect = (template: Template) => {
@@ -602,6 +749,29 @@ export default function Workspace() {
 
         <div className="p-4 border-t" style={{ borderColor: 'var(--border-color)', background: 'var(--bg-card)' }}>
           <div className="max-w-3xl mx-auto">
+            {attachments.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {attachments.map((att, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
+                    style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)' }}
+                  >
+                    <span className="text-sm">{getFileIcon(att.type)}</span>
+                    <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{att.name}</span>
+                    <button
+                      onClick={() => removeAttachment(index)}
+                      className="p-1 rounded hover:bg-gray-200 transition-colors"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
+                      ×
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
+            )}
             <div className="flex items-end gap-3">
               <div className="flex-1 relative">
                 <textarea
@@ -613,15 +783,24 @@ export default function Workspace() {
                       handleSend()
                     }
                   }}
-                  placeholder="输入消息... (Shift+Enter 换行)"
+                  placeholder="输入消息或上传文件... (Shift+Enter 换行)"
                   rows={1}
                   className={isEnterprise ? 'resize-none w-full p-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]' : 'input-cyber resize-none'}
                   style={{ minHeight: '48px', maxHeight: '120px', ...getInputStyle() }}
                 />
                 <div className="absolute right-2 bottom-2 flex items-center gap-1">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    className="hidden"
+                    onChange={handleFileSelect}
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.md,.png,.jpg,.jpeg,.gif,.mp3,.mp4,.wav,.m4a"
+                  />
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
+                    onClick={() => fileInputRef.current?.click()}
                     className="p-2 rounded-lg transition-colors"
                     style={getCardStyle()}
                   >
@@ -629,12 +808,12 @@ export default function Workspace() {
                   </motion.button>
                 </div>
               </div>
-              
+
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleSend}
-                disabled={!input.trim()}
+                disabled={!input.trim() && attachments.length === 0}
                 className={isEnterprise ? 'flex items-center gap-2 px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed' : 'cyber-button-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed'}
                 style={getSendButtonStyle()}
               >

@@ -8,6 +8,7 @@ import Settings from './pages/Settings'
 import DeveloperCenter from './pages/DeveloperCenter'
 import DataCenter from './pages/DataCenter'
 import CreateAgent from './pages/CreateAgent'
+import SkillStudio from './pages/SkillStudio'
 import Login from './pages/Login'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { HistoryProvider } from './contexts/HistoryContext'
@@ -46,6 +47,7 @@ function App() {
                   <Route path="knowledge-base" element={<KnowledgeBase />} />
                   <Route path="settings" element={<Settings />} />
                   <Route path="developer" element={<DeveloperCenter />} />
+                  <Route path="developer/skills" element={<SkillStudio />} />
                   <Route path="data-center" element={<DataCenter />} />
                 </Route>
                 <Route

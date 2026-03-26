@@ -20,7 +20,8 @@ import {
   FolderKanban,
   Edit3,
   Download,
-  Upload
+  Upload,
+  GripVertical
 } from 'lucide-react'
 import { useFavorites } from '../contexts/FavoritesContext'
 import { useTheme } from '../contexts/ThemeContext'
@@ -74,6 +75,12 @@ export default function Marketplace() {
     const saved = localStorage.getItem('customAgents')
     return saved ? JSON.parse(saved) : []
   })
+  const [customAgentOrder, setCustomAgentOrder] = useState<string[]>(() => {
+    const saved = localStorage.getItem('agentOrder')
+    return saved ? JSON.parse(saved) : []
+  })
+  const [draggedId, setDraggedId] = useState<string | null>(null)
+  const [dragOverId, setDragOverId] = useState<string | null>(null)
   const [showEditAgent, setShowEditAgent] = useState(false)
   const [editForm, setEditForm] = useState<NewAgentForm>({
     name: '',
@@ -91,6 +98,10 @@ export default function Marketplace() {
     localStorage.setItem('customAgents', JSON.stringify(customAgents))
   }, [customAgents])
 
+  useEffect(() => {
+    localStorage.setItem('agentOrder', JSON.stringify(customAgentOrder))
+  }, [customAgentOrder])
+
   const allAgents = [...agents, ...customAgents]
 
   const filteredAgents = allAgents.filter(agent => {
@@ -104,7 +115,69 @@ export default function Marketplace() {
     if (activeFilter === 'mvp') matchesFilter = agent.phase === 'MVP'
     if (activeFilter === 't2') matchesFilter = agent.phase === 'T2'
     return matchesSearch && matchesCategory && matchesFilter
+  }).sort((a, b) => {
+    const orderA = customAgentOrder.indexOf(a.id)
+    const orderB = customAgentOrder.indexOf(b.id)
+    if (orderA !== -1 && orderB !== -1) return orderA - orderB
+    if (orderA !== -1) return -1
+    if (orderB !== -1) return 1
+    return 0
   })
+
+  const handleDragStart = (e: React.DragEvent, agentId: string) => {
+    setDraggedId(agentId)
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', agentId)
+  }
+
+  const handleDragOver = (e: React.DragEvent, agentId: string) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    if (draggedId !== agentId) {
+      setDragOverId(agentId)
+    }
+  }
+
+  const handleDragLeave = () => {
+    setDragOverId(null)
+  }
+
+  const handleDrop = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault()
+    if (!draggedId || draggedId === targetId) {
+      setDraggedId(null)
+      setDragOverId(null)
+      return
+    }
+
+    const draggedIndex = customAgentOrder.indexOf(draggedId)
+    const targetIndex = customAgentOrder.indexOf(targetId)
+
+    if (draggedIndex === -1 && targetIndex === -1) {
+      setCustomAgentOrder([...customAgentOrder, draggedId])
+    } else if (draggedIndex === -1 && targetIndex !== -1) {
+      const newOrder = [...customAgentOrder]
+      newOrder.splice(targetIndex, 0, draggedId)
+      setCustomAgentOrder(newOrder)
+    } else if (draggedIndex !== -1 && targetIndex === -1) {
+      const newOrder = customAgentOrder.filter(id => id !== draggedId)
+      newOrder.push(draggedId)
+      setCustomAgentOrder(newOrder)
+    } else {
+      const newOrder = [...customAgentOrder]
+      newOrder.splice(draggedIndex, 1)
+      newOrder.splice(targetIndex, 0, draggedId)
+      setCustomAgentOrder(newOrder)
+    }
+
+    setDraggedId(null)
+    setDragOverId(null)
+  }
+
+  const handleDragEnd = () => {
+    setDraggedId(null)
+    setDragOverId(null)
+  }
 
   const handleSubscribe = (agentId: string) => {
     console.log('Subscribe:', agentId)
@@ -450,12 +523,22 @@ const colorOptions = [
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ delay: index * 0.05 }}
+                draggable
+                onDragStart={(e) => handleDragStart(e as unknown as React.DragEvent, agent.id)}
+                onDragOver={(e) => handleDragOver(e as unknown as React.DragEvent, agent.id)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e as unknown as React.DragEvent, agent.id)}
+                onDragEnd={handleDragEnd}
                 whileHover={isEnterprise ? { y: -4, boxShadow: 'var(--shadow-hover)' } : { scale: 1.02, y: -5 }}
                 onClick={() => setSelectedAgent(agent)}
-                className={isEnterprise ? "p-5 cursor-pointer group relative rounded-lg border transition-all" : "glass-card p-5 cursor-pointer group relative"}
+                className={`${isEnterprise ? "p-5 cursor-pointer group relative rounded-lg border transition-all" : "glass-card p-5 cursor-pointer group relative"} ${
+                  draggedId === agent.id ? 'opacity-50 scale-95' : ''
+                } ${
+                  dragOverId === agent.id ? 'ring-2 ring-blue-500 ring-offset-2' : ''
+                }`}
                 style={isEnterprise ? {
                   background: 'var(--bg-secondary)',
-                  borderColor: 'var(--border-color)'
+                  borderColor: dragOverId === agent.id ? 'var(--color-primary)' : 'var(--border-color)'
                 } : undefined}
               >
                 {agent.recommended && (
@@ -463,24 +546,27 @@ const colorOptions = [
                     <Sparkles className="w-4 h-4" style={isEnterprise ? { color: 'var(--color-primary)' } : { color: 'var(--accent-primary)' }} />
                   </div>
                 )}
-                
-                <div className="absolute top-3 left-3">
-                  <span 
-                    className={isEnterprise 
+
+                <div className="absolute top-3 left-3 flex items-center gap-2">
+                  <span
+                    className={isEnterprise
                       ? `px-2 py-1 rounded-full text-xs font-medium ${
-                          agent.phase === 'MVP' 
-                            ? 'bg-green-100 text-green-700' 
+                          agent.phase === 'MVP'
+                            ? 'bg-green-100 text-green-700'
                             : 'bg-blue-100 text-blue-700'
                         }`
                       : `px-2 py-1 rounded-full text-xs font-medium ${
-                          agent.phase === 'MVP' 
-                            ? 'bg-green-500/20 text-green-400' 
+                          agent.phase === 'MVP'
+                            ? 'bg-green-500/20 text-green-400'
                             : 'bg-blue-500/20 text-blue-400'
                         }`
                     }
                   >
                     {agent.phase}
                   </span>
+                  <div className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-gray-100 transition-colors" style={{ color: 'var(--text-muted)' }}>
+                    <GripVertical className="w-4 h-4" />
+                  </div>
                 </div>
                 
                 <div className="flex items-start justify-between mb-4 mt-6">

@@ -15,7 +15,8 @@ import {
   Landmark,
   Code2,
   LogOut,
-  Building2
+  Building2,
+  Wand2
 } from 'lucide-react'
 import { useState } from 'react'
 import { useTheme } from '../contexts/ThemeContext'
@@ -26,6 +27,7 @@ const navItems = [
   { path: '/marketplace', icon: Store, label: '智能体市场' },
   { path: '/knowledge-base', icon: Database, label: '知识库' },
   { path: '/developer', icon: Code2, label: '智能体自定义' },
+  { path: '/developer/skills', icon: Wand2, label: 'SKILL 工作室' },
 ]
 
 function EnterpriseLayout() {
