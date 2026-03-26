@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
-type Theme = 'dark' | 'light' | 'eye-care' | 'government'
+type Theme = 'dark' | 'light' | 'eye-care' | 'government' | 'enterprise'
 
 interface ThemeContextType {
   theme: Theme
@@ -12,7 +12,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
     const saved = localStorage.getItem('theme')
-    return (saved as Theme) || 'dark'
+    return (saved as Theme) || 'enterprise'
   })
 
   useEffect(() => {

@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getAgentById, Agent } from '../data/agents'
+import { useTheme } from '../contexts/ThemeContext'
 
 interface Message {
   id: string
@@ -85,6 +86,8 @@ const outputs = [
 export default function Workspace() {
   const { agentId } = useParams()
   const navigate = useNavigate()
+  const { theme } = useTheme()
+  const isEnterprise = theme === 'enterprise'
   const [agentInfo, setAgentInfo] = useState<Agent | typeof defaultAgentInfo>(defaultAgentInfo)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -180,25 +183,29 @@ export default function Workspace() {
     return (
       <div className="chart-container mt-4">
         <div className="flex items-center justify-between mb-4">
-          <h4 className="font-medium" style={{ color: 'var(--text-primary)' }}>周流量统计</h4>
+          <h4 className="font-medium" style={getTextStyle('primary')}>周流量统计</h4>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSelectedOutputType('chart')}
               className="p-1.5 rounded transition-colors"
               style={{ 
-                background: selectedOutputType === 'chart' ? 'rgba(0, 229, 255, 0.2)' : 'rgba(255,255,255,0.05)'
+                background: selectedOutputType === 'chart' 
+                  ? (isEnterprise ? 'var(--color-primary-light)' : 'rgba(0, 229, 255, 0.2)') 
+                  : (isEnterprise ? 'var(--bg-tertiary)' : 'rgba(255,255,255,0.05)')
               }}
             >
-              <LineChart className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
+              <LineChart className="w-4 h-4" style={{ color: getAccentColor() }} />
             </button>
             <button
               onClick={() => setSelectedOutputType('table')}
               className="p-1.5 rounded transition-colors"
               style={{ 
-                background: selectedOutputType === 'table' ? 'rgba(0, 229, 255, 0.2)' : 'rgba(255,255,255,0.05)'
+                background: selectedOutputType === 'table' 
+                  ? (isEnterprise ? 'var(--color-primary-light)' : 'rgba(0, 229, 255, 0.2)') 
+                  : (isEnterprise ? 'var(--bg-tertiary)' : 'rgba(255,255,255,0.05)')
               }}
             >
-              <FileSpreadsheet className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
+              <FileSpreadsheet className="w-4 h-4" style={{ color: getAccentColor() }} />
             </button>
           </div>
         </div>
@@ -214,8 +221,8 @@ export default function Workspace() {
                   className="chart-bar w-full"
                   style={{ minHeight: '4px' }}
                 />
-                <span className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>{item.name}</span>
-                <span className="text-xs font-mono" style={{ color: 'var(--accent-primary)' }}>{item.value}%</span>
+                <span className="text-xs mt-2" style={getTextStyle('muted')}>{item.name}</span>
+                <span className="text-xs font-mono" style={{ color: getAccentColor() }}>{item.value}%</span>
               </div>
             ))}
           </div>
@@ -224,15 +231,15 @@ export default function Workspace() {
             <table className="w-full text-sm">
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
-                  <th className="text-left py-2" style={{ color: 'var(--text-secondary)' }}>日期</th>
-                  <th className="text-right py-2" style={{ color: 'var(--text-secondary)' }}>流量指数</th>
+                  <th className="text-left py-2" style={getTextStyle('secondary')}>日期</th>
+                  <th className="text-right py-2" style={getTextStyle('secondary')}>流量指数</th>
                 </tr>
               </thead>
               <tbody>
                 {data.map((item, index) => (
                   <tr key={index} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                    <td className="py-2" style={{ color: 'var(--text-primary)' }}>{item.name}</td>
-                    <td className="py-2 text-right font-mono" style={{ color: 'var(--accent-primary)' }}>{item.value}%</td>
+                    <td className="py-2" style={getTextStyle('primary')}>{item.name}</td>
+                    <td className="py-2 text-right font-mono" style={{ color: getAccentColor() }}>{item.value}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -248,8 +255,8 @@ export default function Workspace() {
       <svg viewBox="0 0 400 200" className="w-full h-full">
         <defs>
           <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="var(--accent-primary)" />
-            <stop offset="100%" stopColor="var(--accent-secondary)" />
+            <stop offset="0%" stopColor={getAccentColor()} />
+            <stop offset="100%" stopColor={isEnterprise ? 'var(--color-primary-active)' : 'var(--accent-secondary)'} />
           </linearGradient>
         </defs>
         
@@ -263,31 +270,108 @@ export default function Workspace() {
         <circle cx="250" cy="100" r="8" className="map-marker" />
         <circle cx="350" cy="100" r="8" className="map-marker" />
         
-        <text x="50" y="130" fill="var(--text-secondary)" fontSize="10" textAnchor="middle">站点A</text>
-        <text x="150" y="130" fill="var(--text-secondary)" fontSize="10" textAnchor="middle">站点B</text>
-        <text x="250" y="130" fill="var(--text-secondary)" fontSize="10" textAnchor="middle">站点C</text>
-        <text x="350" y="130" fill="var(--text-secondary)" fontSize="10" textAnchor="middle">站点D</text>
+        <text x="50" y="130" fill={isEnterprise ? 'var(--text-secondary)' : 'var(--text-secondary)'} fontSize="10" textAnchor="middle">站点A</text>
+        <text x="150" y="130" fill={isEnterprise ? 'var(--text-secondary)' : 'var(--text-secondary)'} fontSize="10" textAnchor="middle">站点B</text>
+        <text x="250" y="130" fill={isEnterprise ? 'var(--text-secondary)' : 'var(--text-secondary)'} fontSize="10" textAnchor="middle">站点C</text>
+        <text x="350" y="130" fill={isEnterprise ? 'var(--text-secondary)' : 'var(--text-secondary)'} fontSize="10" textAnchor="middle">站点D</text>
       </svg>
       
-      <div className="absolute bottom-2 left-2 flex items-center gap-2 px-2 py-1 rounded text-xs" style={{ background: 'var(--bg-card)' }}>
-        <Map className="w-3 h-3" style={{ color: 'var(--accent-primary)' }} />
-        <span style={{ color: 'var(--text-secondary)' }}>项目分布图</span>
+      <div className="absolute bottom-2 left-2 flex items-center gap-2 px-2 py-1 rounded text-xs" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+        <Map className="w-3 h-3" style={{ color: getAccentColor() }} />
+        <span style={getTextStyle('secondary')}>项目分布图</span>
       </div>
     </div>
   )
 
   const knowledgeBases = agentInfo.knowledgeBases || ['政策法规知识库', '公文模板知识库']
 
+  const getContainerStyle = () => {
+    if (isEnterprise) {
+      return { background: 'var(--bg-primary)' }
+    }
+    return { background: 'var(--bg-primary)' }
+  }
+
+  const getHeaderStyle = () => {
+    if (isEnterprise) {
+      return { borderColor: 'var(--border-color)', background: 'var(--bg-card)', boxShadow: 'var(--shadow-card)' }
+    }
+    return { borderColor: 'var(--border-color)', background: 'var(--bg-card)' }
+  }
+
+  const getSidebarStyle = () => {
+    if (isEnterprise) {
+      return { borderColor: 'var(--border-color)', background: 'var(--bg-card)' }
+    }
+    return { borderColor: 'var(--border-color)', background: 'var(--bg-card)' }
+  }
+
+  const getButtonStyle = () => {
+    if (isEnterprise) {
+      return { background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)' }
+    }
+    return { background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)' }
+  }
+
+  const getMessageBubbleStyle = (role: 'user' | 'assistant') => {
+    if (isEnterprise) {
+      if (role === 'user') {
+        return { background: 'var(--color-primary)', borderRadius: 'var(--radius-lg) var(--radius-lg) 4px var(--radius-lg)', color: '#ffffff' }
+      }
+      return { background: 'var(--bg-tertiary)', borderRadius: 'var(--radius-lg) var(--radius-lg) var(--radius-lg) 4px', color: 'var(--text-primary)' }
+    }
+    return {
+      background: role === 'user' ? 'rgba(0, 229, 255, 0.1)' : 'var(--bg-card)',
+      border: `1px solid ${role === 'user' ? 'var(--border-hover)' : 'var(--border-color)'}`,
+      borderRadius: '16px'
+    }
+  }
+
+  const getInputStyle = () => {
+    if (isEnterprise) {
+      return { background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)' }
+    }
+    return {}
+  }
+
+  const getSendButtonStyle = () => {
+    if (isEnterprise) {
+      return { background: 'var(--color-primary)', color: '#ffffff', borderRadius: 'var(--radius-md)' }
+    }
+    return {}
+  }
+
+  const getCardStyle = () => {
+    if (isEnterprise) {
+      return { background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-card)' }
+    }
+    return { background: 'rgba(255,255,255,0.05)' }
+  }
+
+  const getTextStyle = (type: 'primary' | 'secondary' | 'muted') => {
+    if (isEnterprise) {
+      return { color: `var(--text-${type})` }
+    }
+    return { color: `var(--text-${type})` }
+  }
+
+  const getAccentColor = () => {
+    if (isEnterprise) {
+      return 'var(--color-primary)'
+    }
+    return 'var(--accent-primary)'
+  }
+
   return (
-    <div className="h-screen flex flex-col" style={{ background: 'var(--bg-primary)' }}>
-      <header className="h-14 border-b flex items-center justify-between px-4" style={{ borderColor: 'var(--border-color)', background: 'var(--bg-card)' }}>
+    <div className="h-screen flex flex-col" style={getContainerStyle()}>
+      <header className="h-14 border-b flex items-center justify-between px-4" style={getHeaderStyle()}>
         <div className="flex items-center gap-4">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate('/')}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors"
-            style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)' }}
+            style={getButtonStyle()}
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm">返回首页</span>
@@ -298,8 +382,8 @@ export default function Workspace() {
               {agentInfo.icon}
             </div>
             <div>
-              <h1 className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>{agentInfo.name}</h1>
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{agentInfo.description}</p>
+              <h1 className="font-medium text-sm" style={getTextStyle('primary')}>{agentInfo.name}</h1>
+              <p className="text-xs" style={getTextStyle('muted')}>{agentInfo.description}</p>
             </div>
           </div>
         </div>
@@ -309,7 +393,7 @@ export default function Workspace() {
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate('/marketplace')}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors"
-            style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)' }}
+            style={getButtonStyle()}
           >
             <Home className="w-4 h-4" />
             <span className="text-sm">智能体市场</span>
@@ -322,10 +406,7 @@ export default function Workspace() {
         initial={{ x: -20, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         className="w-64 border-r flex flex-col"
-        style={{ 
-          borderColor: 'var(--border-color)',
-          background: 'var(--bg-card)'
-        }}
+        style={getSidebarStyle()}
       >
         <div className="p-4 border-b" style={{ borderColor: 'var(--border-color)' }}>
           <div className="flex items-center gap-3">
@@ -333,8 +414,8 @@ export default function Workspace() {
               {agentInfo.icon}
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="font-medium truncate" style={{ color: 'var(--text-primary)' }}>{agentInfo.name}</h2>
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>在线</p>
+              <h2 className="font-medium truncate" style={getTextStyle('primary')}>{agentInfo.name}</h2>
+              <p className="text-xs" style={getTextStyle('muted')}>在线</p>
             </div>
           </div>
         </div>
@@ -342,13 +423,13 @@ export default function Workspace() {
         <div className="flex-1 overflow-auto p-4">
           <div className="mb-6">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>模板库</h3>
+              <h3 className="text-xs font-medium uppercase tracking-wider" style={getTextStyle('muted')}>模板库</h3>
               <button
                 onClick={() => setShowTemplates(!showTemplates)}
                 className="p-1 rounded transition-colors"
-                style={{ background: 'rgba(255,255,255,0.05)' }}
+                style={getCardStyle()}
               >
-                <Layout className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
+                <Layout className="w-4 h-4" style={{ color: getAccentColor() }} />
               </button>
             </div>
             
@@ -367,12 +448,12 @@ export default function Workspace() {
                       animate={{ opacity: 1, x: 0 }}
                       onClick={() => handleTemplateSelect(template)}
                       className="w-full flex items-center gap-2 p-2 rounded-lg text-left transition-colors"
-                      style={{ background: 'rgba(255,255,255,0.05)' }}
+                      style={getCardStyle()}
                     >
                       <span className="text-lg">{template.icon}</span>
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm truncate" style={{ color: 'var(--text-primary)' }}>{template.name}</div>
-                        <div className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{template.description}</div>
+                        <div className="text-sm truncate" style={getTextStyle('primary')}>{template.name}</div>
+                        <div className="text-xs truncate" style={getTextStyle('muted')}>{template.description}</div>
                       </div>
                     </motion.button>
                   ))}
@@ -382,25 +463,25 @@ export default function Workspace() {
           </div>
 
           <div className="mb-6">
-            <h3 className="text-xs font-medium uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>当前任务</h3>
+            <h3 className="text-xs font-medium uppercase tracking-wider mb-3" style={getTextStyle('muted')}>当前任务</h3>
             <div className="space-y-2">
               {tasks.map((task) => (
-                <div key={task.id} className="p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                <div key={task.id} className="p-3 rounded-lg" style={getCardStyle()}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{task.name}</span>
+                    <span className="text-sm" style={getTextStyle('primary')}>{task.name}</span>
                     {task.status === 'active' ? (
-                      <Loader2 className="w-4 h-4 animate-spin" style={{ color: 'var(--accent-primary)' }} />
+                      <Loader2 className="w-4 h-4 animate-spin" style={{ color: getAccentColor() }} />
                     ) : (
-                      <CheckCircle2 className="w-4 h-4 text-green-400" />
+                      <CheckCircle2 className="w-4 h-4 text-green-500" />
                     )}
                   </div>
                   {task.status === 'active' && (
-                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: isEnterprise ? 'var(--bg-tertiary)' : 'rgba(255,255,255,0.1)' }}>
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${task.progress}%` }}
                         className="h-full rounded-full"
-                        style={{ background: 'linear-gradient(to right, var(--accent-primary), var(--accent-secondary))' }}
+                        style={{ background: isEnterprise ? 'var(--color-primary)' : 'linear-gradient(to right, var(--accent-primary), var(--accent-secondary))' }}
                       />
                     </div>
                   )}
@@ -410,12 +491,12 @@ export default function Workspace() {
           </div>
 
           <div>
-            <h3 className="text-xs font-medium uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>历史任务</h3>
+            <h3 className="text-xs font-medium uppercase tracking-wider mb-3" style={getTextStyle('muted')}>历史任务</h3>
             <div className="space-y-2">
-              <div className="p-3 rounded-lg opacity-60" style={{ background: 'rgba(255,255,255,0.05)' }}>
+              <div className="p-3 rounded-lg opacity-60" style={getCardStyle()}>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>上周报告生成</span>
-                  <CheckCircle2 className="w-4 h-4 text-green-400" />
+                  <span className="text-sm" style={getTextStyle('secondary')}>上周报告生成</span>
+                  <CheckCircle2 className="w-4 h-4 text-green-500" />
                 </div>
               </div>
             </div>
@@ -423,17 +504,17 @@ export default function Workspace() {
         </div>
 
         <div className="p-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
-          <h3 className="text-xs font-medium uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>输出文件</h3>
+          <h3 className="text-xs font-medium uppercase tracking-wider mb-3" style={getTextStyle('muted')}>输出文件</h3>
           <div className="space-y-2">
             {outputs.map((output) => (
               <motion.button
                 key={output.id}
                 whileHover={{ scale: 1.02 }}
                 className="w-full flex items-center gap-2 p-2 rounded-lg transition-colors"
-                style={{ background: 'rgba(255,255,255,0.05)' }}
+                style={getCardStyle()}
               >
-                <output.icon className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
-                <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{output.name}</span>
+                <output.icon className="w-4 h-4" style={{ color: getAccentColor() }} />
+                <span className="text-sm" style={getTextStyle('secondary')}>{output.name}</span>
               </motion.button>
             ))}
           </div>
@@ -441,7 +522,7 @@ export default function Workspace() {
       </motion.aside>
 
       <div className="flex-1 flex flex-col">
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-6" style={{ background: isEnterprise ? 'var(--bg-primary)' : 'transparent' }}>
           <div className="max-w-3xl mx-auto space-y-6">
             <AnimatePresence>
               {messages.map((message, index) => (
@@ -458,21 +539,18 @@ export default function Workspace() {
                         <div className={`w-6 h-6 rounded-lg bg-gradient-to-br ${agentInfo.color} flex items-center justify-center text-sm`}>
                           {agentInfo.icon}
                         </div>
-                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{agentInfo.name}</span>
-                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                        <span className="text-xs" style={getTextStyle('muted')}>{agentInfo.name}</span>
+                        <span className="text-xs" style={getTextStyle('muted')}>
                           {message.timestamp.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
                     )}
                     
-                    <div className="p-4 rounded-2xl" style={{
-                      background: message.role === 'user' ? 'rgba(0, 229, 255, 0.1)' : 'var(--bg-card)',
-                      border: `1px solid ${message.role === 'user' ? 'var(--border-hover)' : 'var(--border-color)'}`
-                    }}>
-                      <div className="whitespace-pre-wrap" style={{ color: 'var(--text-primary)' }}>{message.content}</div>
+                    <div className="p-4" style={getMessageBubbleStyle(message.role)}>
+                      <div className="whitespace-pre-wrap" style={message.role === 'user' ? { color: '#ffffff' } : getTextStyle('primary')}>{message.content}</div>
                       
                       {message.status === 'thinking' && (
-                        <div className="flex items-center gap-2 mt-2" style={{ color: 'var(--accent-primary)' }}>
+                        <div className="flex items-center gap-2 mt-2" style={{ color: getAccentColor() }}>
                           <Loader2 className="w-4 h-4 animate-spin" />
                           <span className="text-sm">处理中...</span>
                         </div>
@@ -484,10 +562,10 @@ export default function Workspace() {
                       {message.attachments && (
                         <div className="flex flex-wrap gap-2 mt-3">
                           {message.attachments.map((att, i) => (
-                            <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.1)' }}>
-                              <FileText className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
-                              <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{att.name}</span>
-                              <Download className="w-4 h-4 cursor-pointer transition-colors" style={{ color: 'var(--text-muted)' }} />
+                            <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-lg" style={getCardStyle()}>
+                              <FileText className="w-4 h-4" style={{ color: getAccentColor() }} />
+                              <span className="text-sm" style={getTextStyle('secondary')}>{att.name}</span>
+                              <Download className="w-4 h-4 cursor-pointer transition-colors" style={getTextStyle('muted')} />
                             </div>
                           ))}
                         </div>
@@ -496,7 +574,7 @@ export default function Workspace() {
 
                     {message.role === 'user' && (
                       <div className="flex justify-end mt-1">
-                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                        <span className="text-xs" style={getTextStyle('muted')}>
                           {message.timestamp.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
@@ -511,9 +589,9 @@ export default function Workspace() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="flex items-center gap-2"
-                style={{ color: 'var(--text-muted)' }}
+                style={getTextStyle('muted')}
               >
-                <Loader2 className="w-4 h-4 animate-spin" style={{ color: 'var(--accent-primary)' }} />
+                <Loader2 className="w-4 h-4 animate-spin" style={{ color: getAccentColor() }} />
                 <span className="text-sm">智能体正在思考...</span>
               </motion.div>
             )}
@@ -537,17 +615,17 @@ export default function Workspace() {
                   }}
                   placeholder="输入消息... (Shift+Enter 换行)"
                   rows={1}
-                  className="input-cyber resize-none"
-                  style={{ minHeight: '48px', maxHeight: '120px' }}
+                  className={isEnterprise ? 'resize-none w-full p-3 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]' : 'input-cyber resize-none'}
+                  style={{ minHeight: '48px', maxHeight: '120px', ...getInputStyle() }}
                 />
                 <div className="absolute right-2 bottom-2 flex items-center gap-1">
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     className="p-2 rounded-lg transition-colors"
-                    style={{ background: 'rgba(255,255,255,0.05)' }}
+                    style={getCardStyle()}
                   >
-                    <Paperclip className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
+                    <Paperclip className="w-4 h-4" style={getTextStyle('muted')} />
                   </motion.button>
                 </div>
               </div>
@@ -557,7 +635,8 @@ export default function Workspace() {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleSend}
                 disabled={!input.trim()}
-                className="cyber-button-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className={isEnterprise ? 'flex items-center gap-2 px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed' : 'cyber-button-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed'}
+                style={getSendButtonStyle()}
               >
                 <Send className="w-4 h-4" />
                 <span>发送</span>
@@ -571,33 +650,30 @@ export default function Workspace() {
         initial={{ x: 20, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         className="w-72 border-l flex flex-col"
-        style={{ 
-          borderColor: 'var(--border-color)',
-          background: 'var(--bg-card)'
-        }}
+        style={getSidebarStyle()}
       >
         <div className="p-4 border-b" style={{ borderColor: 'var(--border-color)' }}>
-          <h3 className="font-medium" style={{ color: 'var(--text-primary)' }}>辅助工具</h3>
+          <h3 className="font-medium" style={getTextStyle('primary')}>辅助工具</h3>
         </div>
 
         <div className="flex-1 overflow-auto p-4 space-y-6">
           <div>
-            <h4 className="text-xs font-medium uppercase tracking-wider mb-3 flex items-center gap-2" style={{ color: 'var(--text-muted)' }}>
+            <h4 className="text-xs font-medium uppercase tracking-wider mb-3 flex items-center gap-2" style={getTextStyle('muted')}>
               <Database className="w-4 h-4" />
               知识库
             </h4>
             <div className="space-y-2">
               {knowledgeBases.map((kb) => (
-                <div key={kb} className="flex items-center gap-2 p-2 rounded-lg transition-colors cursor-pointer" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                  <div className="w-2 h-2 rounded-full" style={{ background: 'var(--accent-primary)' }} />
-                  <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{kb}</span>
+                <div key={kb} className="flex items-center gap-2 p-2 rounded-lg transition-colors cursor-pointer" style={getCardStyle()}>
+                  <div className="w-2 h-2 rounded-full" style={{ background: getAccentColor() }} />
+                  <span className="text-sm" style={getTextStyle('secondary')}>{kb}</span>
                 </div>
               ))}
             </div>
           </div>
 
           <div>
-            <h4 className="text-xs font-medium uppercase tracking-wider mb-3 flex items-center gap-2" style={{ color: 'var(--text-muted)' }}>
+            <h4 className="text-xs font-medium uppercase tracking-wider mb-3 flex items-center gap-2" style={getTextStyle('muted')}>
               <Wrench className="w-4 h-4" />
               输出工具
             </h4>
@@ -612,25 +688,25 @@ export default function Workspace() {
                   key={tool.name}
                   whileHover={{ scale: 1.02 }}
                   className="w-full flex items-center gap-2 p-2 rounded-lg transition-colors"
-                  style={{ background: 'rgba(255,255,255,0.05)' }}
+                  style={getCardStyle()}
                 >
-                  <tool.icon className="w-4 h-4" style={{ color: 'var(--accent-secondary)' }} />
-                  <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{tool.name}</span>
+                  <tool.icon className="w-4 h-4" style={{ color: isEnterprise ? 'var(--color-primary-active)' : 'var(--accent-secondary)' }} />
+                  <span className="text-sm" style={getTextStyle('secondary')}>{tool.name}</span>
                 </motion.button>
               ))}
             </div>
           </div>
 
           <div>
-            <h4 className="text-xs font-medium uppercase tracking-wider mb-3 flex items-center gap-2" style={{ color: 'var(--text-muted)' }}>
+            <h4 className="text-xs font-medium uppercase tracking-wider mb-3 flex items-center gap-2" style={getTextStyle('muted')}>
               <Link2 className="w-4 h-4" />
               相关资源
             </h4>
             <div className="space-y-2">
               {['历史会议纪要', '公文范文库', '政策文件'].map((res) => (
-                <div key={res} className="flex items-center gap-2 p-2 rounded-lg transition-colors cursor-pointer" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                  <div className="w-2 h-2 rounded-full" style={{ background: 'var(--accent-secondary)' }} />
-                  <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>{res}</span>
+                <div key={res} className="flex items-center gap-2 p-2 rounded-lg transition-colors cursor-pointer" style={getCardStyle()}>
+                  <div className="w-2 h-2 rounded-full" style={{ background: isEnterprise ? 'var(--color-primary-active)' : 'var(--accent-secondary)' }} />
+                  <span className="text-sm" style={getTextStyle('secondary')}>{res}</span>
                 </div>
               ))}
             </div>
@@ -642,18 +718,18 @@ export default function Workspace() {
             <motion.button
               whileHover={{ scale: 1.02 }}
               className="flex-1 flex items-center justify-center gap-2 p-2 rounded-lg text-sm"
-              style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)' }}
+              style={getCardStyle()}
             >
-              <Pause className="w-4 h-4" />
-              暂停
+              <Pause className="w-4 h-4" style={getTextStyle('secondary')} />
+              <span style={getTextStyle('secondary')}>暂停</span>
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.02 }}
               className="flex-1 flex items-center justify-center gap-2 p-2 rounded-lg text-sm"
-              style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)' }}
+              style={getCardStyle()}
             >
-              <RotateCcw className="w-4 h-4" />
-              重置
+              <RotateCcw className="w-4 h-4" style={getTextStyle('secondary')} />
+              <span style={getTextStyle('secondary')}>重置</span>
             </motion.button>
           </div>
         </div>

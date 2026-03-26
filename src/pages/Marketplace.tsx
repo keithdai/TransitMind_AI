@@ -23,6 +23,7 @@ import {
   Upload
 } from 'lucide-react'
 import { useFavorites } from '../contexts/FavoritesContext'
+import { useTheme } from '../contexts/ThemeContext'
 import { agents, categories, Agent } from '../data/agents'
 
 const categoryIcons: Record<string, React.ElementType> = {
@@ -51,6 +52,8 @@ interface NewAgentForm {
 }
 
 export default function Marketplace() {
+  const { theme } = useTheme()
+  const isEnterprise = theme === 'enterprise'
   const [searchQuery, setSearchQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
   const [activeFilter, setActiveFilter] = useState<'all' | 'subscribed' | 'recommended' | 'favorites' | 'mvp' | 't2'>('all')
@@ -187,7 +190,10 @@ const colorOptions = [
 ]
 
   return (
-    <div className="h-full p-8 overflow-auto">
+    <div 
+      className="h-full overflow-auto" 
+      style={isEnterprise ? { background: 'var(--bg-primary)', padding: 'var(--spacing-lg)' } : { padding: '32px' }}
+    >
       <div className="max-w-7xl mx-auto space-y-6">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -195,12 +201,19 @@ const colorOptions = [
           className="flex items-center justify-between"
         >
           <div>
-            <h1 className="font-display text-3xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>智能体市场</h1>
-            <p style={{ color: 'var(--text-secondary)' }}>发现并订阅适合您工作需求的政务智能体</p>
+            <h1 
+              className="font-display text-3xl font-bold mb-2" 
+              style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-primary)' }}
+            >
+              智能体市场
+            </h1>
+            <p style={isEnterprise ? { color: 'var(--text-secondary)' } : { color: 'var(--text-secondary)' }}>
+              发现并订阅适合您工作需求的政务智能体
+            </p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-              <span className="font-mono" style={{ color: 'var(--accent-primary)' }}>{allAgents.length}</span>
+            <div className="flex items-center gap-2 text-sm" style={isEnterprise ? { color: 'var(--text-secondary)' } : { color: 'var(--text-secondary)' }}>
+              <span className="font-mono" style={isEnterprise ? { color: 'var(--color-primary)' } : { color: 'var(--accent-primary)' }}>{allAgents.length}</span>
               <span>个智能体可用</span>
             </div>
             <motion.button
@@ -216,8 +229,13 @@ const colorOptions = [
                 a.click()
                 URL.revokeObjectURL(url)
               }}
-              className="cyber-button flex items-center gap-2"
+              className={isEnterprise ? "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all" : "cyber-button flex items-center gap-2"}
               disabled={customAgents.length === 0}
+              style={isEnterprise ? {
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-secondary)'
+              } : undefined}
             >
               <Download className="w-4 h-4" />
               <span>导出</span>
@@ -251,7 +269,12 @@ const colorOptions = [
                 }
                 input.click()
               }}
-              className="cyber-button flex items-center gap-2"
+              className={isEnterprise ? "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all" : "cyber-button flex items-center gap-2"}
+              style={isEnterprise ? {
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-secondary)'
+              } : undefined}
             >
               <Upload className="w-4 h-4" />
               <span>导入</span>
@@ -260,7 +283,11 @@ const colorOptions = [
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setShowAddAgent(true)}
-              className="cyber-button-primary flex items-center gap-2"
+              className={isEnterprise ? "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all" : "cyber-button-primary flex items-center gap-2"}
+              style={isEnterprise ? {
+                background: 'var(--color-primary)',
+                color: '#ffffff'
+              } : undefined}
             >
               <Plus className="w-4 h-4" />
               <span>上架智能体</span>
@@ -272,17 +299,26 @@ const colorOptions = [
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="glass-panel p-4"
+          className={isEnterprise ? "p-4 rounded-lg border" : "glass-panel p-4"}
+          style={isEnterprise ? {
+            background: 'var(--bg-secondary)',
+            borderColor: 'var(--border-color)'
+          } : undefined}
         >
           <div className="flex items-center gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={isEnterprise ? { color: 'var(--text-muted)' } : { color: 'var(--text-muted)' }} />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="搜索智能体..."
-                className="input-cyber pl-12"
+                className={isEnterprise ? "pl-12 pr-4 py-2.5 w-full rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" : "input-cyber pl-12"}
+                style={isEnterprise ? {
+                  background: 'var(--bg-tertiary)',
+                  borderColor: 'var(--border-color)',
+                  color: 'var(--text-primary)'
+                } : undefined}
               />
             </div>
             
@@ -300,8 +336,12 @@ const colorOptions = [
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setActiveFilter(filter.id as typeof activeFilter)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all`}
-                  style={{
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
+                  style={isEnterprise ? {
+                    background: activeFilter === filter.id ? 'var(--color-primary-lighter)' : 'var(--bg-tertiary)',
+                    border: activeFilter === filter.id ? '1px solid var(--color-primary)' : '1px solid transparent',
+                    color: activeFilter === filter.id ? 'var(--color-primary)' : 'var(--text-secondary)'
+                  } : {
                     background: activeFilter === filter.id ? 'rgba(0, 229, 255, 0.1)' : 'rgba(255,255,255,0.05)',
                     border: activeFilter === filter.id ? '1px solid var(--border-hover)' : '1px solid var(--border-color)',
                     color: activeFilter === filter.id ? 'var(--accent-primary)' : 'var(--text-secondary)'
@@ -323,8 +363,12 @@ const colorOptions = [
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setActiveCategory(category.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all`}
-                  style={{
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
+                  style={isEnterprise ? {
+                    background: activeCategory === category.id ? 'var(--color-primary-lighter)' : 'var(--bg-tertiary)',
+                    border: activeCategory === category.id ? '1px solid var(--color-primary)' : '1px solid transparent',
+                    color: activeCategory === category.id ? 'var(--color-primary)' : 'var(--text-secondary)'
+                  } : {
                     background: activeCategory === category.id ? 'rgba(0, 229, 255, 0.1)' : 'rgba(255,255,255,0.05)',
                     border: activeCategory === category.id ? '1px solid var(--border-hover)' : '1px solid var(--border-color)',
                     color: activeCategory === category.id ? 'var(--accent-primary)' : 'var(--text-secondary)'
@@ -342,11 +386,15 @@ const colorOptions = [
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-panel p-4"
+            className={isEnterprise ? "p-4 rounded-lg border" : "glass-panel p-4"}
+            style={isEnterprise ? {
+              background: 'var(--bg-secondary)',
+              borderColor: 'var(--border-color)'
+            } : undefined}
           >
             <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
-              <span className="font-medium" style={{ color: 'var(--text-primary)' }}>为您推荐</span>
+              <Sparkles className="w-4 h-4" style={isEnterprise ? { color: 'var(--color-primary)' } : { color: 'var(--accent-primary)' }} />
+              <span className="font-medium" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-primary)' }}>为您推荐</span>
             </div>
             <div className="space-y-2">
               {recommendedForUser.map((rec, index) => {
@@ -359,22 +407,29 @@ const colorOptions = [
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
                     className="flex items-center justify-between p-3 rounded-lg"
-                    style={{ background: 'rgba(255,255,255,0.05)' }}
+                    style={isEnterprise ? {
+                      background: 'var(--bg-tertiary)',
+                      border: '1px solid var(--color-border-light)'
+                    } : { background: 'rgba(255,255,255,0.05)' }}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${agent.color} flex items-center justify-center text-lg`}>
                         {agent.icon}
                       </div>
                       <div>
-                        <div className="font-medium" style={{ color: 'var(--text-primary)' }}>{agent.name}</div>
-                        <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{rec.reason}</div>
+                        <div className="font-medium" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-primary)' }}>{agent.name}</div>
+                        <div className="text-xs" style={isEnterprise ? { color: 'var(--text-muted)' } : { color: 'var(--text-muted)' }}>{rec.reason}</div>
                       </div>
                     </div>
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setSelectedAgent(agent)}
-                      className="cyber-button text-xs"
+                      className={isEnterprise ? "px-3 py-1.5 rounded-lg text-xs font-medium" : "cyber-button text-xs"}
+                      style={isEnterprise ? {
+                        background: 'var(--bg-tertiary)',
+                        color: 'var(--text-secondary)'
+                      } : undefined}
                     >
                       查看详情
                     </motion.button>
@@ -395,23 +450,34 @@ const colorOptions = [
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ delay: index * 0.05 }}
-                whileHover={{ scale: 1.02, y: -5 }}
+                whileHover={isEnterprise ? { y: -4, boxShadow: 'var(--shadow-hover)' } : { scale: 1.02, y: -5 }}
                 onClick={() => setSelectedAgent(agent)}
-                className="glass-card p-5 cursor-pointer group relative"
+                className={isEnterprise ? "p-5 cursor-pointer group relative rounded-lg border transition-all" : "glass-card p-5 cursor-pointer group relative"}
+                style={isEnterprise ? {
+                  background: 'var(--bg-secondary)',
+                  borderColor: 'var(--border-color)'
+                } : undefined}
               >
                 {agent.recommended && (
                   <div className="absolute top-3 right-3">
-                    <Sparkles className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
+                    <Sparkles className="w-4 h-4" style={isEnterprise ? { color: 'var(--color-primary)' } : { color: 'var(--accent-primary)' }} />
                   </div>
                 )}
                 
                 <div className="absolute top-3 left-3">
                   <span 
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      agent.phase === 'MVP' 
-                        ? 'bg-green-500/20 text-green-400' 
-                        : 'bg-blue-500/20 text-blue-400'
-                    }`}
+                    className={isEnterprise 
+                      ? `px-2 py-1 rounded-full text-xs font-medium ${
+                          agent.phase === 'MVP' 
+                            ? 'bg-green-100 text-green-700' 
+                            : 'bg-blue-100 text-blue-700'
+                        }`
+                      : `px-2 py-1 rounded-full text-xs font-medium ${
+                          agent.phase === 'MVP' 
+                            ? 'bg-green-500/20 text-green-400' 
+                            : 'bg-blue-500/20 text-blue-400'
+                        }`
+                    }
                   >
                     {agent.phase}
                   </span>
@@ -423,7 +489,7 @@ const colorOptions = [
                   </div>
                   <div className="flex items-center gap-2">
                     {agent.subscribed && (
-                      <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs" style={{ background: 'rgba(34, 197, 94, 0.2)', color: '#22c55e' }}>
+                      <div className={isEnterprise ? "flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-green-100 text-green-700" : "flex items-center gap-1 px-2 py-1 rounded-full text-xs"} style={!isEnterprise ? { background: 'rgba(34, 197, 94, 0.2)', color: '#22c55e' } : undefined}>
                         <Check className="w-3 h-3" />
                         <span>已订阅</span>
                       </div>
@@ -436,28 +502,35 @@ const colorOptions = [
                         handleFavorite(agent)
                       }}
                       className="p-1.5 rounded-lg transition-colors"
-                      style={{ 
-                        background: isFavorite(agent.id) ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255,255,255,0.05)'
-                      }}
+                      style={isEnterprise 
+                        ? { background: isFavorite(agent.id) ? '#fef2f2' : 'var(--bg-tertiary)' }
+                        : { background: isFavorite(agent.id) ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255,255,255,0.05)' }
+                      }
                     >
-                      <Heart className={`w-4 h-4 ${isFavorite(agent.id) ? 'fill-red-500 text-red-500' : ''}`} style={{ color: isFavorite(agent.id) ? '#ef4444' : 'var(--text-muted)' }} />
+                      <Heart className={`w-4 h-4 ${isFavorite(agent.id) ? 'fill-red-500 text-red-500' : ''}`} style={isFavorite(agent.id) ? { color: '#ef4444' } : isEnterprise ? { color: 'var(--text-muted)' } : { color: 'var(--text-muted)' }} />
                     </motion.button>
                   </div>
                 </div>
 
-                <h3 className="font-display font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                <h3 className="font-display font-semibold mb-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-primary)' }}>
                   {agent.name}
                 </h3>
-                <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{agent.description}</p>
+                <p className="text-sm mb-4 line-clamp-2" style={isEnterprise ? { color: 'var(--text-secondary)' } : { color: 'var(--text-secondary)' }}>{agent.description}</p>
 
                 <div className="flex flex-wrap gap-2 mb-4">
                   {agent.tags.slice(0, 3).map((tag) => (
-                    <span key={tag} className="tag-cyber">{tag}</span>
+                    <span 
+                      key={tag} 
+                      className={isEnterprise ? "px-2 py-1 rounded text-xs" : "tag-cyber"}
+                      style={isEnterprise ? { background: 'var(--color-primary-lighter)', color: 'var(--color-primary)' } : undefined}
+                    >
+                      {tag}
+                    </span>
                   ))}
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-4" style={{ color: 'var(--text-muted)' }}>
+                  <div className="flex items-center gap-4" style={isEnterprise ? { color: 'var(--text-muted)' } : { color: 'var(--text-muted)' }}>
                     <div className="flex items-center gap-1">
                       <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                       <span>{agent.rating}</span>
@@ -467,7 +540,7 @@ const colorOptions = [
                       <span>{agent.users}</span>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-all" style={{ color: 'var(--text-muted)' }} />
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-all" style={isEnterprise ? { color: 'var(--text-muted)' } : { color: 'var(--text-muted)' }} />
                 </div>
               </motion.div>
             ))}
@@ -481,7 +554,8 @@ const colorOptions = [
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-8"
+            className="fixed inset-0 z-50 flex items-center justify-center p-8"
+            style={isEnterprise ? { background: 'rgba(0, 0, 0, 0.5)' } : { background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(4px)' }}
             onClick={() => setSelectedAgent(null)}
           >
             <motion.div
@@ -489,7 +563,11 @@ const colorOptions = [
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-panel p-8 max-w-4xl w-full max-h-[85vh] overflow-auto"
+              className={isEnterprise ? "p-8 max-w-4xl w-full max-h-[85vh] overflow-auto rounded-lg border" : "glass-panel p-8 max-w-4xl w-full max-h-[85vh] overflow-auto"}
+              style={isEnterprise ? {
+                background: 'var(--bg-secondary)',
+                borderColor: 'var(--border-color)'
+              } : undefined}
             >
               <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center gap-4">
@@ -497,19 +575,26 @@ const colorOptions = [
                     {selectedAgent.icon}
                   </div>
                   <div>
-                    <h2 className="font-display text-2xl font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                    <h2 className="font-display text-2xl font-bold flex items-center gap-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-primary)' }}>
                       {selectedAgent.name}
                       <span 
-                        className={`text-xs px-2 py-1 rounded-full font-medium ${
-                          selectedAgent.phase === 'MVP' 
-                            ? 'bg-green-500/20 text-green-400' 
-                            : 'bg-blue-500/20 text-blue-400'
-                        }`}
+                        className={isEnterprise 
+                          ? `text-xs px-2 py-1 rounded-full font-medium ${
+                              selectedAgent.phase === 'MVP' 
+                                ? 'bg-green-100 text-green-700' 
+                                : 'bg-blue-100 text-blue-700'
+                            }`
+                          : `text-xs px-2 py-1 rounded-full font-medium ${
+                              selectedAgent.phase === 'MVP' 
+                                ? 'bg-green-500/20 text-green-400' 
+                                : 'bg-blue-500/20 text-blue-400'
+                            }`
+                        }
                       >
                         {selectedAgent.phase}
                       </span>
                     </h2>
-                    <div className="flex items-center gap-4 mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    <div className="flex items-center gap-4 mt-1 text-sm" style={isEnterprise ? { color: 'var(--text-secondary)' } : { color: 'var(--text-secondary)' }}>
                       <div className="flex items-center gap-1">
                         <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                         <span>{selectedAgent.rating}</span>
@@ -531,32 +616,42 @@ const colorOptions = [
                     whileTap={{ scale: 0.9 }}
                     onClick={() => handleFavorite(selectedAgent)}
                     className="p-2 rounded-lg transition-colors"
-                    style={{ background: isFavorite(selectedAgent.id) ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255,255,255,0.05)' }}
+                    style={isEnterprise 
+                      ? { background: isFavorite(selectedAgent.id) ? '#fef2f2' : 'var(--bg-tertiary)' }
+                      : { background: isFavorite(selectedAgent.id) ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255,255,255,0.05)' }
+                    }
                   >
-                    <Heart className={`w-5 h-5 ${isFavorite(selectedAgent.id) ? 'fill-red-500' : ''}`} style={{ color: isFavorite(selectedAgent.id) ? '#ef4444' : 'var(--text-muted)' }} />
+                    <Heart className={`w-5 h-5 ${isFavorite(selectedAgent.id) ? 'fill-red-500' : ''}`} style={isFavorite(selectedAgent.id) ? { color: '#ef4444' } : isEnterprise ? { color: 'var(--text-muted)' } : { color: 'var(--text-muted)' }} />
                   </motion.button>
                   <button
                     onClick={() => setSelectedAgent(null)}
                     className="p-2 rounded-lg transition-colors"
-                    style={{ background: 'rgba(255,255,255,0.05)' }}
+                    style={isEnterprise ? { background: 'var(--bg-tertiary)' } : { background: 'rgba(255,255,255,0.05)' }}
                   >
-                    <X className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+                    <X className="w-5 h-5" style={isEnterprise ? { color: 'var(--text-muted)' } : { color: 'var(--text-muted)' }} />
                   </button>
                 </div>
               </div>
 
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>功能介绍</h3>
-                  <p style={{ color: 'var(--text-primary)' }}>{selectedAgent.description}</p>
+                  <h3 className="text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-secondary)' } : { color: 'var(--text-secondary)' }}>功能介绍</h3>
+                  <p style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-primary)' }}>{selectedAgent.description}</p>
                 </div>
 
                 {selectedAgent.coreCapabilities.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>核心能力</h3>
+                    <h3 className="text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-secondary)' } : { color: 'var(--text-secondary)' }}>核心能力</h3>
                     <div className="flex flex-wrap gap-2">
                       {selectedAgent.coreCapabilities.map((capability) => (
-                        <span key={capability} className="px-3 py-1.5 rounded-lg text-sm font-medium" style={{ background: 'rgba(0, 229, 255, 0.1)', color: 'var(--accent-primary)' }}>
+                        <span 
+                          key={capability} 
+                          className="px-3 py-1.5 rounded-lg text-sm font-medium"
+                          style={isEnterprise 
+                            ? { background: 'var(--color-primary-lighter)', color: 'var(--color-primary)' }
+                            : { background: 'rgba(0, 229, 255, 0.1)', color: 'var(--accent-primary)' }
+                          }
+                        >
                           {capability}
                         </span>
                       ))}
@@ -566,10 +661,16 @@ const colorOptions = [
 
                 {selectedAgent.features.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>功能特性</h3>
+                    <h3 className="text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-secondary)' } : { color: 'var(--text-secondary)' }}>功能特性</h3>
                     <div className="flex flex-wrap gap-2">
                       {selectedAgent.features.map((feature) => (
-                        <span key={feature} className="tag-cyber">{feature}</span>
+                        <span 
+                          key={feature} 
+                          className={isEnterprise ? "px-2 py-1 rounded text-xs" : "tag-cyber"}
+                          style={isEnterprise ? { background: 'var(--color-primary-lighter)', color: 'var(--color-primary)' } : undefined}
+                        >
+                          {feature}
+                        </span>
                       ))}
                     </div>
                   </div>
@@ -578,11 +679,11 @@ const colorOptions = [
                 {selectedAgent.demoScenarios.length > 0 && (
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>演示场景</h3>
+                      <h3 className="text-sm font-medium" style={isEnterprise ? { color: 'var(--text-secondary)' } : { color: 'var(--text-secondary)' }}>演示场景</h3>
                       <button
                         onClick={() => setShowDemoScenarios(!showDemoScenarios)}
                         className="text-xs flex items-center gap-1"
-                        style={{ color: 'var(--accent-primary)' }}
+                        style={isEnterprise ? { color: 'var(--color-primary)' } : { color: 'var(--accent-primary)' }}
                       >
                         <PlayCircle className="w-3 h-3" />
                         {showDemoScenarios ? '收起' : '展开全部'}
@@ -596,17 +697,33 @@ const colorOptions = [
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.1 }}
                           className="p-4 rounded-xl border"
-                          style={{ background: 'rgba(255,255,255,0.03)', borderColor: 'var(--border-color)' }}
+                          style={isEnterprise 
+                            ? { background: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }
+                            : { background: 'rgba(255,255,255,0.03)', borderColor: 'var(--border-color)' }
+                          }
                         >
                           <div className="flex items-start gap-3 mb-3">
-                            <div className="p-2 rounded-lg" style={{ background: 'rgba(0, 229, 255, 0.1)' }}>
-                              <PlayCircle className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
+                            <div 
+                              className="p-2 rounded-lg"
+                              style={isEnterprise 
+                                ? { background: 'var(--color-primary-lighter)' }
+                                : { background: 'rgba(0, 229, 255, 0.1)' }
+                              }
+                            >
+                              <PlayCircle className="w-4 h-4" style={isEnterprise ? { color: 'var(--color-primary)' } : { color: 'var(--accent-primary)' }} />
                             </div>
                             <div className="flex-1">
-                              <h4 className="font-medium mb-1" style={{ color: 'var(--text-primary)' }}>{scenario.title}</h4>
+                              <h4 className="font-medium mb-1" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-primary)' }}>{scenario.title}</h4>
                               <div className="flex flex-wrap gap-1">
                                 {scenario.highlights.map((highlight) => (
-                                  <span key={highlight} className="text-xs px-2 py-0.5 rounded" style={{ background: 'rgba(0, 229, 255, 0.1)', color: 'var(--accent-primary)' }}>
+                                  <span 
+                                    key={highlight} 
+                                    className="text-xs px-2 py-0.5 rounded"
+                                    style={isEnterprise 
+                                      ? { background: 'var(--color-primary-lighter)', color: 'var(--color-primary)' }
+                                      : { background: 'rgba(0, 229, 255, 0.1)', color: 'var(--accent-primary)' }
+                                    }
+                                  >
                                     {highlight}
                                   </span>
                                 ))}
@@ -615,13 +732,19 @@ const colorOptions = [
                           </div>
                           
                           <div className="space-y-3">
-                            <div className="p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                              <div className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>用户输入</div>
-                              <div className="text-sm" style={{ color: 'var(--text-primary)' }}>{scenario.userInput}</div>
+                            <div 
+                              className="p-3 rounded-lg"
+                              style={isEnterprise ? { background: 'var(--bg-secondary)', border: '1px solid var(--color-border-light)' } : { background: 'rgba(255,255,255,0.02)' }}
+                            >
+                              <div className="text-xs mb-1" style={isEnterprise ? { color: 'var(--text-muted)' } : { color: 'var(--text-muted)' }}>用户输入</div>
+                              <div className="text-sm" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-primary)' }}>{scenario.userInput}</div>
                             </div>
-                            <div className="p-3 rounded-lg" style={{ background: 'rgba(0, 229, 255, 0.05)' }}>
-                              <div className="text-xs mb-1" style={{ color: 'var(--accent-primary)' }}>智能体响应</div>
-                              <pre className="text-sm whitespace-pre-wrap font-sans" style={{ color: 'var(--text-primary)' }}>{scenario.agentResponse}</pre>
+                            <div 
+                              className="p-3 rounded-lg"
+                              style={isEnterprise ? { background: 'var(--color-primary-lighter)' } : { background: 'rgba(0, 229, 255, 0.05)' }}
+                            >
+                              <div className="text-xs mb-1" style={isEnterprise ? { color: 'var(--color-primary)' } : { color: 'var(--accent-primary)' }}>智能体响应</div>
+                              <pre className="text-sm whitespace-pre-wrap font-sans" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-primary)' }}>{scenario.agentResponse}</pre>
                             </div>
                           </div>
                         </motion.div>
@@ -632,33 +755,41 @@ const colorOptions = [
 
                 {selectedAgent.knowledgeBases.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>关联知识库</h3>
+                    <h3 className="text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-secondary)' } : { color: 'var(--text-secondary)' }}>关联知识库</h3>
                     <div className="space-y-2">
                       {selectedAgent.knowledgeBases.map((kb) => (
-                        <div key={kb} className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                          <Layers className="w-4 h-4" style={{ color: 'var(--accent-secondary)' }} />
-                          <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{kb}</span>
+                        <div 
+                          key={kb} 
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg"
+                          style={isEnterprise ? { background: 'var(--bg-tertiary)' } : { background: 'rgba(255,255,255,0.05)' }}
+                        >
+                          <Layers className="w-4 h-4" style={isEnterprise ? { color: 'var(--text-secondary)' } : { color: 'var(--accent-secondary)' }} />
+                          <span className="text-sm" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-primary)' }}>{kb}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
 
-                <div className="flex items-center gap-4 pt-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
+                <div className="flex items-center gap-4 pt-4 border-t" style={isEnterprise ? { borderColor: 'var(--border-color)' } : { borderColor: 'var(--border-color)' }}>
                   {selectedAgent.subscribed ? (
                     <>
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleUse(selectedAgent)}
-                        className="flex-1 cyber-button-primary flex items-center justify-center gap-2"
+                        className={isEnterprise ? "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium" : "flex-1 cyber-button-primary flex items-center justify-center gap-2"}
+                        style={isEnterprise ? {
+                          background: 'var(--color-primary)',
+                          color: '#ffffff'
+                        } : undefined}
                       >
                         <span>立即使用</span>
                       </motion.button>
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className="cyber-button flex items-center justify-center gap-2"
+                        className={isEnterprise ? "flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium bg-green-100 text-green-700" : "cyber-button flex items-center justify-center gap-2"}
                       >
                         <Check className="w-4 h-4" />
                         已订阅
@@ -670,7 +801,12 @@ const colorOptions = [
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleSubscribe(selectedAgent.id)}
-                        className="flex-1 cyber-button flex items-center justify-center gap-2"
+                        className={isEnterprise ? "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border" : "flex-1 cyber-button flex items-center justify-center gap-2"}
+                        style={isEnterprise ? {
+                          background: 'var(--bg-secondary)',
+                          borderColor: 'var(--border-color)',
+                          color: 'var(--text-secondary)'
+                        } : undefined}
                       >
                         <Plus className="w-4 h-4" />
                         订阅智能体
@@ -679,7 +815,11 @@ const colorOptions = [
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleUse(selectedAgent)}
-                        className="cyber-button-primary flex items-center justify-center gap-2"
+                        className={isEnterprise ? "flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium" : "cyber-button-primary flex items-center justify-center gap-2"}
+                        style={isEnterprise ? {
+                          background: 'var(--color-primary)',
+                          color: '#ffffff'
+                        } : undefined}
                       >
                         <span>立即使用</span>
                       </motion.button>
@@ -703,7 +843,12 @@ const colorOptions = [
                           })
                           setShowEditAgent(true)
                         }}
-                        className="cyber-button flex items-center justify-center gap-2"
+                        className={isEnterprise ? "flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border" : "cyber-button flex items-center justify-center gap-2"}
+                        style={isEnterprise ? {
+                          background: 'var(--bg-secondary)',
+                          borderColor: 'var(--border-color)',
+                          color: 'var(--text-secondary)'
+                        } : undefined}
                       >
                         <Edit3 className="w-4 h-4" />
                         编辑
@@ -712,8 +857,12 @@ const colorOptions = [
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleDeleteAgent(selectedAgent.id)}
-                        className="cyber-button flex items-center justify-center gap-2"
-                        style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}
+                        className={isEnterprise ? "flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium" : "cyber-button flex items-center justify-center gap-2"}
+                        style={isEnterprise ? {
+                          background: '#fef2f2',
+                          color: '#dc2626',
+                          border: '1px solid #fecaca'
+                        } : { background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}
                       >
                         <Trash2 className="w-4 h-4" />
                         删除
@@ -733,7 +882,8 @@ const colorOptions = [
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-8"
+            className="fixed inset-0 z-50 flex items-center justify-center p-8"
+            style={isEnterprise ? { background: 'rgba(0, 0, 0, 0.5)' } : { background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(4px)' }}
             onClick={() => setShowAddAgent(false)}
           >
             <motion.div
@@ -741,71 +891,95 @@ const colorOptions = [
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-panel p-8 max-w-xl w-full max-h-[85vh] overflow-auto"
+              className={isEnterprise ? "p-8 max-w-xl w-full max-h-[85vh] overflow-auto rounded-lg border" : "glass-panel p-8 max-w-xl w-full max-h-[85vh] overflow-auto"}
+              style={isEnterprise ? {
+                background: 'var(--bg-secondary)',
+                borderColor: 'var(--border-color)'
+              } : undefined}
             >
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="font-display text-xl font-bold" style={{ color: 'var(--text-primary)' }}>上架智能体</h2>
-                  <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>通过配置链接将外部智能体服务上架到市场</p>
+                  <h2 className="font-display text-xl font-bold" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-primary)' }}>上架智能体</h2>
+                  <p className="text-sm mt-1" style={isEnterprise ? { color: 'var(--text-secondary)' } : { color: 'var(--text-secondary)' }}>通过配置链接将外部智能体服务上架到市场</p>
                 </div>
                 <button
                   onClick={() => setShowAddAgent(false)}
                   className="p-2 rounded-lg transition-colors"
-                  style={{ background: 'rgba(255,255,255,0.05)' }}
+                  style={isEnterprise ? { background: 'var(--bg-tertiary)' } : { background: 'rgba(255,255,255,0.05)' }}
                 >
-                  <X className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+                  <X className="w-5 h-5" style={isEnterprise ? { color: 'var(--text-muted)' } : { color: 'var(--text-muted)' }} />
                 </button>
               </div>
 
               <div className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                    智能体名称 <span style={{ color: 'var(--accent-primary)' }}>*</span>
+                  <label className="block text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-secondary)' }}>
+                    智能体名称 <span style={isEnterprise ? { color: 'var(--color-primary)' } : { color: 'var(--accent-primary)' }}>*</span>
                   </label>
                   <input
                     type="text"
                     value={newAgent.name}
                     onChange={(e) => setNewAgent(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="输入智能体名称"
-                    className="input-cyber"
+                    className={isEnterprise ? "w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" : "input-cyber"}
+                    style={isEnterprise ? {
+                      background: 'var(--bg-tertiary)',
+                      borderColor: 'var(--border-color)',
+                      color: 'var(--text-primary)'
+                    } : undefined}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                    服务链接 <span style={{ color: 'var(--accent-primary)' }}>*</span>
+                  <label className="block text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-secondary)' }}>
+                    服务链接 <span style={isEnterprise ? { color: 'var(--color-primary)' } : { color: 'var(--accent-primary)' }}>*</span>
                   </label>
                   <div className="relative">
-                    <Link2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+                    <Link2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={isEnterprise ? { color: 'var(--text-muted)' } : { color: 'var(--text-muted)' }} />
                     <input
                       type="url"
                       value={newAgent.externalUrl}
                       onChange={(e) => setNewAgent(prev => ({ ...prev, externalUrl: e.target.value }))}
                       placeholder="https://example.com/agent"
-                      className="input-cyber pl-12"
+                      className={isEnterprise ? "w-full pl-12 pr-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" : "input-cyber pl-12"}
+                      style={isEnterprise ? {
+                        background: 'var(--bg-tertiary)',
+                        borderColor: 'var(--border-color)',
+                        color: 'var(--text-primary)'
+                      } : undefined}
                     />
                   </div>
-                  <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>智能体服务的访问地址，将在新窗口中打开</p>
+                  <p className="text-xs mt-1" style={isEnterprise ? { color: 'var(--text-muted)' } : { color: 'var(--text-muted)' }}>智能体服务的访问地址，将在新窗口中打开</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>描述</label>
+                  <label className="block text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-secondary)' }}>描述</label>
                   <textarea
                     value={newAgent.description}
                     onChange={(e) => setNewAgent(prev => ({ ...prev, description: e.target.value }))}
                     placeholder="输入智能体功能描述"
                     rows={3}
-                    className="input-cyber resize-none"
+                    className={isEnterprise ? "w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" : "input-cyber resize-none"}
+                    style={isEnterprise ? {
+                      background: 'var(--bg-tertiary)',
+                      borderColor: 'var(--border-color)',
+                      color: 'var(--text-primary)'
+                    } : undefined}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>分类</label>
+                    <label className="block text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-secondary)' }}>分类</label>
                     <select
                       value={newAgent.category}
                       onChange={(e) => setNewAgent(prev => ({ ...prev, category: e.target.value }))}
-                      className="input-cyber"
+                      className={isEnterprise ? "w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" : "input-cyber"}
+                      style={isEnterprise ? {
+                        background: 'var(--bg-tertiary)',
+                        borderColor: 'var(--border-color)',
+                        color: 'var(--text-primary)'
+                      } : undefined}
                     >
                       {categories.filter(c => c.id !== 'all').map((cat) => (
                         <option key={cat.id} value={cat.id}>{cat.label}</option>
@@ -814,14 +988,17 @@ const colorOptions = [
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>图标</label>
+                    <label className="block text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-secondary)' }}>图标</label>
                     <div className="flex flex-wrap gap-2">
                       {iconOptions.map((icon) => (
                         <button
                           key={icon}
                           onClick={() => setNewAgent(prev => ({ ...prev, icon }))}
-                          className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl transition-all`}
-                          style={{
+                          className="w-10 h-10 rounded-lg flex items-center justify-center text-xl transition-all"
+                          style={isEnterprise ? {
+                            background: newAgent.icon === icon ? 'var(--color-primary-lighter)' : 'var(--bg-tertiary)',
+                            border: newAgent.icon === icon ? '1px solid var(--color-primary)' : '1px solid transparent'
+                          } : {
                             background: newAgent.icon === icon ? 'rgba(0, 229, 255, 0.2)' : 'rgba(255,255,255,0.05)',
                             border: newAgent.icon === icon ? '1px solid var(--border-hover)' : '1px solid var(--border-color)'
                           }}
@@ -832,14 +1009,17 @@ const colorOptions = [
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>颜色</label>
+                    <label className="block text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-secondary)' }}>颜色</label>
                     <div className="flex flex-wrap gap-2">
                       {colorOptions.map((color) => (
                         <button
                           key={color.id}
                           onClick={() => setNewAgent(prev => ({ ...prev, color: color.id }))}
                           className={`w-10 h-10 rounded-lg flex items-center justify-center text-xs transition-all bg-gradient-to-br ${color.id}`}
-                          style={{
+                          style={isEnterprise ? {
+                            border: newAgent.color === color.id ? '2px solid var(--color-primary)' : '1px solid var(--border-color)',
+                            transform: newAgent.color === color.id ? 'scale(1.1)' : 'scale(1)'
+                          } : {
                             border: newAgent.color === color.id ? '2px solid var(--border-hover)' : '1px solid var(--border-color)',
                             transform: newAgent.color === color.id ? 'scale(1.1)' : 'scale(1)'
                           }}
@@ -853,24 +1033,34 @@ const colorOptions = [
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>标签</label>
+                  <label className="block text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-secondary)' }}>标签</label>
                   <input
                     type="text"
                     value={newAgent.tags}
                     onChange={(e) => setNewAgent(prev => ({ ...prev, tags: e.target.value }))}
                     placeholder="数据分析, 报告生成（用逗号分隔）"
-                    className="input-cyber"
+                    className={isEnterprise ? "w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" : "input-cyber"}
+                    style={isEnterprise ? {
+                      background: 'var(--bg-tertiary)',
+                      borderColor: 'var(--border-color)',
+                      color: 'var(--text-primary)'
+                    } : undefined}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>功能特性</label>
+                  <label className="block text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-secondary)' }}>功能特性</label>
                   <input
                     type="text"
                     value={newAgent.features}
                     onChange={(e) => setNewAgent(prev => ({ ...prev, features: e.target.value }))}
                     placeholder="功能1, 功能2, 功能3（用逗号分隔）"
-                    className="input-cyber"
+                    className={isEnterprise ? "w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" : "input-cyber"}
+                    style={isEnterprise ? {
+                      background: 'var(--bg-tertiary)',
+                      borderColor: 'var(--border-color)',
+                      color: 'var(--text-primary)'
+                    } : undefined}
                   />
                 </div>
               </div>
@@ -880,7 +1070,12 @@ const colorOptions = [
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setShowAddAgent(false)}
-                  className="cyber-button"
+                  className={isEnterprise ? "px-4 py-2.5 rounded-lg text-sm font-medium border" : "cyber-button"}
+                  style={isEnterprise ? {
+                    background: 'var(--bg-secondary)',
+                    borderColor: 'var(--border-color)',
+                    color: 'var(--text-secondary)'
+                  } : undefined}
                 >
                   取消
                 </motion.button>
@@ -889,7 +1084,11 @@ const colorOptions = [
                   whileTap={{ scale: 0.98 }}
                   onClick={handleAddAgent}
                   disabled={!newAgent.name || !newAgent.externalUrl}
-                  className="cyber-button-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={isEnterprise ? "px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed" : "cyber-button-primary disabled:opacity-50 disabled:cursor-not-allowed"}
+                  style={isEnterprise ? {
+                    background: 'var(--color-primary)',
+                    color: '#ffffff'
+                  } : undefined}
                 >
                   上架智能体
                 </motion.button>
@@ -905,7 +1104,8 @@ const colorOptions = [
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-8"
+            className="fixed inset-0 z-50 flex items-center justify-center p-8"
+            style={isEnterprise ? { background: 'rgba(0, 0, 0, 0.5)' } : { background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(4px)' }}
             onClick={() => setShowEditAgent(false)}
           >
             <motion.div
@@ -913,71 +1113,95 @@ const colorOptions = [
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-panel p-8 max-w-xl w-full max-h-[85vh] overflow-auto"
+              className={isEnterprise ? "p-8 max-w-xl w-full max-h-[85vh] overflow-auto rounded-lg border" : "glass-panel p-8 max-w-xl w-full max-h-[85vh] overflow-auto"}
+              style={isEnterprise ? {
+                background: 'var(--bg-secondary)',
+                borderColor: 'var(--border-color)'
+              } : undefined}
             >
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="font-display text-xl font-bold" style={{ color: 'var(--text-primary)' }}>编辑智能体</h2>
-                  <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>修改智能体信息</p>
+                  <h2 className="font-display text-xl font-bold" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-primary)' }}>编辑智能体</h2>
+                  <p className="text-sm mt-1" style={isEnterprise ? { color: 'var(--text-secondary)' } : { color: 'var(--text-secondary)' }}>修改智能体信息</p>
                 </div>
                 <button
                   onClick={() => setShowEditAgent(false)}
                   className="p-2 rounded-lg transition-colors"
-                  style={{ background: 'rgba(255,255,255,0.05)' }}
+                  style={isEnterprise ? { background: 'var(--bg-tertiary)' } : { background: 'rgba(255,255,255,0.05)' }}
                 >
-                  <X className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+                  <X className="w-5 h-5" style={isEnterprise ? { color: 'var(--text-muted)' } : { color: 'var(--text-muted)' }} />
                 </button>
               </div>
 
               <div className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                    智能体名称 <span style={{ color: 'var(--accent-primary)' }}>*</span>
+                  <label className="block text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-secondary)' }}>
+                    智能体名称 <span style={isEnterprise ? { color: 'var(--color-primary)' } : { color: 'var(--accent-primary)' }}>*</span>
                   </label>
                   <input
                     type="text"
                     value={editForm.name}
                     onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="输入智能体名称"
-                    className="input-cyber"
+                    className={isEnterprise ? "w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" : "input-cyber"}
+                    style={isEnterprise ? {
+                      background: 'var(--bg-tertiary)',
+                      borderColor: 'var(--border-color)',
+                      color: 'var(--text-primary)'
+                    } : undefined}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                    服务链接 <span style={{ color: 'var(--accent-primary)' }}>*</span>
+                  <label className="block text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-secondary)' }}>
+                    服务链接 <span style={isEnterprise ? { color: 'var(--color-primary)' } : { color: 'var(--accent-primary)' }}>*</span>
                   </label>
                   <div className="relative">
-                    <Link2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+                    <Link2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={isEnterprise ? { color: 'var(--text-muted)' } : { color: 'var(--text-muted)' }} />
                     <input
                       type="url"
                       value={editForm.externalUrl}
                       onChange={(e) => setEditForm(prev => ({ ...prev, externalUrl: e.target.value }))}
                       placeholder="https://example.com/agent"
-                      className="input-cyber pl-12"
+                      className={isEnterprise ? "w-full pl-12 pr-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" : "input-cyber pl-12"}
+                      style={isEnterprise ? {
+                        background: 'var(--bg-tertiary)',
+                        borderColor: 'var(--border-color)',
+                        color: 'var(--text-primary)'
+                      } : undefined}
                     />
                   </div>
-                  <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>智能体服务的访问地址，将在新窗口中打开</p>
+                  <p className="text-xs mt-1" style={isEnterprise ? { color: 'var(--text-muted)' } : { color: 'var(--text-muted)' }}>智能体服务的访问地址，将在新窗口中打开</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>描述</label>
+                  <label className="block text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-secondary)' }}>描述</label>
                   <textarea
                     value={editForm.description}
                     onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
                     placeholder="输入智能体功能描述"
                     rows={3}
-                    className="input-cyber resize-none"
+                    className={isEnterprise ? "w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" : "input-cyber resize-none"}
+                    style={isEnterprise ? {
+                      background: 'var(--bg-tertiary)',
+                      borderColor: 'var(--border-color)',
+                      color: 'var(--text-primary)'
+                    } : undefined}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>分类</label>
+                    <label className="block text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-secondary)' }}>分类</label>
                     <select
                       value={editForm.category}
                       onChange={(e) => setEditForm(prev => ({ ...prev, category: e.target.value }))}
-                      className="input-cyber"
+                      className={isEnterprise ? "w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" : "input-cyber"}
+                      style={isEnterprise ? {
+                        background: 'var(--bg-tertiary)',
+                        borderColor: 'var(--border-color)',
+                        color: 'var(--text-primary)'
+                      } : undefined}
                     >
                       {categories.filter(c => c.id !== 'all').map((cat) => (
                         <option key={cat.id} value={cat.id}>{cat.label}</option>
@@ -986,14 +1210,17 @@ const colorOptions = [
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>图标</label>
+                    <label className="block text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-secondary)' }}>图标</label>
                     <div className="flex flex-wrap gap-2">
                       {iconOptions.map((icon) => (
                         <button
                           key={icon}
                           onClick={() => setEditForm(prev => ({ ...prev, icon }))}
-                          className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl transition-all`}
-                          style={{
+                          className="w-10 h-10 rounded-lg flex items-center justify-center text-xl transition-all"
+                          style={isEnterprise ? {
+                            background: editForm.icon === icon ? 'var(--color-primary-lighter)' : 'var(--bg-tertiary)',
+                            border: editForm.icon === icon ? '1px solid var(--color-primary)' : '1px solid transparent'
+                          } : {
                             background: editForm.icon === icon ? 'rgba(0, 229, 255, 0.2)' : 'rgba(255,255,255,0.05)',
                             border: editForm.icon === icon ? '1px solid var(--border-hover)' : '1px solid var(--border-color)'
                           }}
@@ -1004,14 +1231,17 @@ const colorOptions = [
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>颜色</label>
+                    <label className="block text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-secondary)' }}>颜色</label>
                     <div className="flex flex-wrap gap-2">
                       {colorOptions.map((color) => (
                         <button
                           key={color.id}
                           onClick={() => setEditForm(prev => ({ ...prev, color: color.id }))}
                           className={`w-10 h-10 rounded-lg flex items-center justify-center text-xs transition-all bg-gradient-to-br ${color.id}`}
-                          style={{
+                          style={isEnterprise ? {
+                            border: editForm.color === color.id ? '2px solid var(--color-primary)' : '1px solid var(--border-color)',
+                            transform: editForm.color === color.id ? 'scale(1.1)' : 'scale(1)'
+                          } : {
                             border: editForm.color === color.id ? '2px solid var(--border-hover)' : '1px solid var(--border-color)',
                             transform: editForm.color === color.id ? 'scale(1.1)' : 'scale(1)'
                           }}
@@ -1025,24 +1255,34 @@ const colorOptions = [
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>标签</label>
+                  <label className="block text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-secondary)' }}>标签</label>
                   <input
                     type="text"
                     value={editForm.tags}
                     onChange={(e) => setEditForm(prev => ({ ...prev, tags: e.target.value }))}
                     placeholder="数据分析, 报告生成（用逗号分隔）"
-                    className="input-cyber"
+                    className={isEnterprise ? "w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" : "input-cyber"}
+                    style={isEnterprise ? {
+                      background: 'var(--bg-tertiary)',
+                      borderColor: 'var(--border-color)',
+                      color: 'var(--text-primary)'
+                    } : undefined}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>功能特性</label>
+                  <label className="block text-sm font-medium mb-2" style={isEnterprise ? { color: 'var(--text-primary)' } : { color: 'var(--text-secondary)' }}>功能特性</label>
                   <input
                     type="text"
                     value={editForm.features}
                     onChange={(e) => setEditForm(prev => ({ ...prev, features: e.target.value }))}
                     placeholder="功能1, 功能2, 功能3（用逗号分隔）"
-                    className="input-cyber"
+                    className={isEnterprise ? "w-full px-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" : "input-cyber"}
+                    style={isEnterprise ? {
+                      background: 'var(--bg-tertiary)',
+                      borderColor: 'var(--border-color)',
+                      color: 'var(--text-primary)'
+                    } : undefined}
                   />
                 </div>
               </div>
@@ -1052,7 +1292,12 @@ const colorOptions = [
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setShowEditAgent(false)}
-                  className="cyber-button"
+                  className={isEnterprise ? "px-4 py-2.5 rounded-lg text-sm font-medium border" : "cyber-button"}
+                  style={isEnterprise ? {
+                    background: 'var(--bg-secondary)',
+                    borderColor: 'var(--border-color)',
+                    color: 'var(--text-secondary)'
+                  } : undefined}
                 >
                   取消
                 </motion.button>
@@ -1081,7 +1326,11 @@ const colorOptions = [
                     setSelectedAgent(null)
                   }}
                   disabled={!editForm.name || !editForm.externalUrl}
-                  className="cyber-button-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={isEnterprise ? "px-4 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed" : "cyber-button-primary disabled:opacity-50 disabled:cursor-not-allowed"}
+                  style={isEnterprise ? {
+                    background: 'var(--color-primary)',
+                    color: '#ffffff'
+                  } : undefined}
                 >
                   保存修改
                 </motion.button>

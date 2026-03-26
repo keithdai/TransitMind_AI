@@ -75,6 +75,44 @@
   --glow-color: rgba(200, 16, 46, 0.15);
 }
 
+[data-theme="enterprise"] {
+  --bg-primary: #F7F9FC;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #F0F5FE;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FFFFFF;
+  --text-primary: #1D2129;
+  --text-secondary: #4E5969;
+  --text-muted: #86909C;
+  --border-color: #E5E6EB;
+  --border-hover: #1459FA;
+  --accent-primary: #1459FA;
+  --accent-secondary: #0032A6;
+  --glow-color: rgba(20, 89, 250, 0.08);
+  --success-color: #00B578;
+  --warning-color: #FF8F1F;
+  --error-color: #F53F3F;
+  --info-color: #165DFF;
+  --color-primary: #1459FA;
+  --color-primary-hover: #3D7AFF;
+  --color-primary-active: #0032A6;
+  --color-primary-light: #CFE3FE;
+  --color-primary-lighter: #F0F5FE;
+  --color-text-disabled: #C9CDD4;
+  --color-border-light: #F0F5FE;
+  --shadow-card: 0 2px 12px rgba(0, 50, 166, 0.08);
+  --shadow-hover: 0 4px 16px rgba(0, 50, 166, 0.12);
+  --shadow-modal: 0 8px 32px rgba(0, 50, 166, 0.16);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -586,4 +624,196 @@ body {
 
 [data-theme="government"] .floating-hex {
   opacity: 0;
+}
+
+[data-theme="enterprise"] .grid-bg {
+  background-image: 
+    linear-gradient(rgba(20, 89, 250, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20, 89, 250, 0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+[data-theme="enterprise"] .radial-gradient-bg {
+  background: none;
+}
+
+[data-theme="enterprise"] .scanline {
+  display: none;
+}
+
+[data-theme="enterprise"] .particle {
+  opacity: 0;
+}
+
+[data-theme="enterprise"] .side-glow-left,
+[data-theme="enterprise"] .side-glow-right {
+  display: none;
+}
+
+[data-theme="enterprise"] .corner-decoration {
+  display: none;
+}
+
+[data-theme="enterprise"] .data-stream {
+  display: none;
+}
+
+[data-theme="enterprise"] .pulse-ring {
+  display: none;
+}
+
+[data-theme="enterprise"] .floating-hex {
+  display: none;
+}
+
+[data-theme="enterprise"] .glass-panel {
+  backdrop-filter: none;
+  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+}
+
+[data-theme="enterprise"] .glass-card {
+  backdrop-filter: none;
+  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+  transition: all 0.2s ease;
+}
+
+[data-theme="enterprise"] .glass-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+  border-color: var(--border-hover);
+}
+
+[data-theme="enterprise"] .cyber-button {
+  clip-path: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  text-transform: none;
+  letter-spacing: normal;
+  background: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+[data-theme="enterprise"] .cyber-button:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-lighter);
+  box-shadow: none;
+}
+
+[data-theme="enterprise"] .cyber-button:active {
+  background: var(--color-primary-light);
+}
+
+[data-theme="enterprise"] .cyber-button-primary {
+  clip-path: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  text-transform: none;
+  letter-spacing: normal;
+  background: var(--color-primary);
+  border-radius: var(--radius-sm);
+  color: #FFFFFF;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+[data-theme="enterprise"] .cyber-button-primary:hover {
+  background: var(--color-primary-hover);
+  box-shadow: 0 2px 8px rgba(20, 89, 250, 0.3);
+}
+
+[data-theme="enterprise"] .cyber-button-primary:active {
+  background: var(--color-primary-active);
+}
+
+[data-theme="enterprise"] .cyber-button-primary:disabled {
+  background: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+[data-theme="enterprise"] .input-cyber {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: #FFFFFF;
+  color: var(--text-primary);
+  height: 32px;
+  padding: 4px 12px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+[data-theme="enterprise"] .input-cyber::placeholder {
+  color: var(--color-text-disabled);
+}
+
+[data-theme="enterprise"] .input-cyber:hover {
+  border-color: #C9CDD4;
+}
+
+[data-theme="enterprise"] .input-cyber:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(20, 89, 250, 0.1);
+  outline: none;
+}
+
+[data-theme="enterprise"] .input-cyber:disabled {
+  background: #F7F9FC;
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+[data-theme="enterprise"] .tag-cyber {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: var(--color-primary-lighter);
+  border: 1px solid rgba(20, 89, 250, 0.3);
+  border-radius: var(--radius-sm);
+  color: var(--color-primary);
+  padding: 2px 8px;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+[data-theme="enterprise"] .section-title {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+[data-theme="enterprise"] .section-title::before {
+  background: var(--color-primary);
+  border-radius: 2px;
+  width: 4px;
+}
+
+[data-theme="enterprise"] body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+[data-theme="enterprise"] .chart-bar {
+  background: linear-gradient(to top, var(--color-primary), var(--color-primary-hover));
+}
+
+[data-theme="enterprise"] .chart-line {
+  stroke: var(--color-primary);
+}
+
+[data-theme="enterprise"] .map-marker {
+  fill: var(--color-primary);
+  filter: drop-shadow(0 0 4px var(--color-primary));
+}
+
+[data-theme="enterprise"] .map-route {
+  stroke: var(--color-primary-active);
 }

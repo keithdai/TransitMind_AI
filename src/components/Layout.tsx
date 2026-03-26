@@ -14,7 +14,8 @@ import {
   Zap,
   Landmark,
   Code2,
-  LogOut
+  LogOut,
+  Building2
 } from 'lucide-react'
 import { useState } from 'react'
 import { useTheme } from '../contexts/ThemeContext'
@@ -27,7 +28,7 @@ const navItems = [
   { path: '/developer', icon: Code2, label: '智能体自定义' },
 ]
 
-export default function Layout() {
+function EnterpriseLayout() {
   const location = useLocation()
   const navigate = useNavigate()
   const { theme, setTheme } = useTheme()
@@ -40,6 +41,226 @@ export default function Layout() {
     { id: 'light', label: '浅色模式', icon: Sun },
     { id: 'eye-care', label: '护眼模式', icon: Eye },
     { id: 'government', label: '政务风格', icon: Landmark },
+    { id: 'enterprise', label: '企业风格', icon: Building2 },
+  ] as const
+
+  return (
+    <div className="min-h-screen flex" style={{ background: '#F7F9FC' }}>
+      <aside 
+        className="w-[220px] flex flex-col border-r fixed left-0 top-0 bottom-0 z-20"
+        style={{ 
+          background: '#FFFFFF',
+          borderColor: '#F0F5FE'
+        }}
+      >
+        <div className="h-[64px] flex items-center px-5 border-b" style={{ borderColor: '#F0F5FE', background: '#FFFFFF' }}>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #1459FA 0%, #0032A6 100%)' }}>
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="font-bold text-base" style={{ color: '#1D2129' }}>TransitMind</h1>
+              <p className="text-xs" style={{ color: '#86909C' }}>AI Portal</p>
+            </div>
+          </div>
+        </div>
+
+        <nav className="flex-1 py-4 px-3">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className="flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition-all duration-200"
+              style={({ isActive }) => ({
+                background: isActive ? '#E8F3FF' : 'transparent',
+                color: isActive ? '#1459FA' : '#4E5969',
+                fontWeight: isActive ? 500 : 400,
+                borderRight: isActive ? '3px solid #1459FA' : '3px solid transparent',
+              })}
+            >
+              {({ isActive }) => (
+                <>
+                  <item.icon className="w-5 h-5" style={{ color: isActive ? '#1459FA' : '#86909C' }} />
+                  <span className="text-sm">{item.label}</span>
+                </>
+              )}
+            </NavLink>
+          ))}
+        </nav>
+
+        <div className="p-3 border-t" style={{ borderColor: '#F0F5FE' }}>
+          <NavLink
+            to="/settings"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200"
+            style={({ isActive }) => ({
+              background: isActive ? '#E8F3FF' : 'transparent',
+              color: isActive ? '#1459FA' : '#4E5969',
+              borderRight: isActive ? '3px solid #1459FA' : '3px solid transparent',
+            })}
+          >
+            {({ isActive }) => (
+              <>
+                <Settings className="w-5 h-5" style={{ color: isActive ? '#1459FA' : '#86909C' }} />
+                <span className="text-sm">系统设置</span>
+              </>
+            )}
+          </NavLink>
+        </div>
+      </aside>
+
+      <div className="flex-1 ml-[220px] flex flex-col min-h-screen">
+        <header 
+          className="h-[64px] flex items-center justify-between px-8 border-b fixed top-0 right-0 left-[220px] z-10"
+          style={{ 
+            background: '#FFFFFF',
+            borderColor: '#F0F5FE'
+          }}
+        >
+          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs" style={{ background: '#E8FFEA', color: '#00B578', border: '1px solid #9CE6A0' }}>
+            <Zap className="w-3.5 h-3.5" />
+            <span>系统在线</span>
+            <span className="font-mono opacity-60">12ms</span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <button
+                onClick={() => setShowThemeMenu(!showThemeMenu)}
+                className="p-2 rounded-lg transition-colors"
+                style={{ color: '#86909C' }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#F0F5FE'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+              >
+                {theme === 'dark' ? <Moon className="w-5 h-5" /> :
+                 theme === 'light' ? <Sun className="w-5 h-5" /> :
+                 theme === 'eye-care' ? <Eye className="w-5 h-5" /> :
+                 theme === 'government' ? <Landmark className="w-5 h-5" /> :
+                 <Building2 className="w-5 h-5" />}
+              </button>
+              
+              <AnimatePresence>
+                {showThemeMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute right-0 top-14 p-2 min-w-[160px] z-50 rounded-lg border"
+                    style={{ background: '#FFFFFF', borderColor: '#E5E6EB', boxShadow: '0 4px 12px rgba(0, 50, 166, 0.1)' }}
+                  >
+                    {themeOptions.map((option) => (
+                      <button
+                        key={option.id}
+                        onClick={() => { setTheme(option.id); setShowThemeMenu(false) }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-colors"
+                        style={{ 
+                          background: theme === option.id ? '#E8F3FF' : 'transparent',
+                          color: theme === option.id ? '#1459FA' : '#4E5969'
+                        }}
+                      >
+                        <option.icon className="w-4 h-4" />
+                        <span>{option.label}</span>
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <button className="relative p-2 rounded-lg transition-colors" style={{ color: '#86909C' }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#F0F5FE'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
+              <Bell className="w-5 h-5" />
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full text-xs flex items-center justify-center text-white" style={{ background: '#F53F3F' }}>
+                3
+              </span>
+            </button>
+            
+            <div className="relative">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors"
+                style={{ borderColor: '#1459FA', background: '#E8F3FF', color: '#1459FA' }}
+              >
+                <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: '#1459FA' }}>
+                  <User className="w-3 h-3 text-white" />
+                </div>
+                <span className="text-sm font-medium" style={{ color: '#1D2129' }}>张明</span>
+                <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: '#CFE3FE', color: '#1459FA' }}>交通规划部</span>
+              </button>
+              
+              <AnimatePresence>
+                {showUserMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute right-0 top-14 p-2 min-w-[160px] z-50 rounded-lg border"
+                    style={{ background: '#FFFFFF', borderColor: '#E5E6EB', boxShadow: '0 4px 12px rgba(0, 50, 166, 0.1)' }}
+                  >
+                    <button
+                      onClick={() => { 
+                        logout()
+                        navigate('/login')
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-colors"
+                      style={{ color: '#F53F3F' }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = '#FFECE8'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>退出登录</span>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 overflow-auto mt-[64px] p-6" style={{ background: '#F7F9FC' }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="h-full"
+            >
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
+        </main>
+
+        <footer 
+          className="h-10 flex items-center justify-center text-xs border-t"
+          style={{ 
+            borderColor: '#F0F5FE',
+            background: '#FFFFFF',
+            color: '#86909C'
+          }}
+        >
+          <span>深城交研究院研发</span>
+        </footer>
+      </div>
+    </div>
+  )
+}
+
+function DefaultLayout() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { theme, setTheme } = useTheme()
+  const { logout } = useAuth()
+  const [showThemeMenu, setShowThemeMenu] = useState(false)
+  const [showUserMenu, setShowUserMenu] = useState(false)
+
+  const themeOptions = [
+    { id: 'dark', label: '深色模式', icon: Moon },
+    { id: 'light', label: '浅色模式', icon: Sun },
+    { id: 'eye-care', label: '护眼模式', icon: Eye },
+    { id: 'government', label: '政务风格', icon: Landmark },
+    { id: 'enterprise', label: '企业风格', icon: Building2 },
   ] as const
 
   return (
@@ -156,7 +377,8 @@ export default function Layout() {
                 {theme === 'dark' ? <Moon className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} /> :
                  theme === 'light' ? <Sun className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} /> :
                  theme === 'eye-care' ? <Eye className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} /> :
-                 <Landmark className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />}
+                 theme === 'government' ? <Landmark className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} /> :
+                 <Building2 className="w-5 h-5" style={{ color: 'var(--text-secondary)' }} />}
               </motion.button>
               
               <AnimatePresence>
@@ -295,4 +517,11 @@ export default function Layout() {
       </div>
     </div>
   )
+}
+
+export default function Layout() {
+  const { theme } = useTheme()
+  const isEnterprise = theme === 'enterprise'
+
+  return isEnterprise ? <EnterpriseLayout /> : <DefaultLayout />
 }
